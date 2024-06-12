@@ -1,0 +1,89 @@
+[build-system]
+requires = ["setuptools", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "mixscatter"
+version = "0.0.1"
+description = "Scattering functions of particle mixtures."
+readme = "README.md"
+authors = [
+    { name = "Joel Diaz Maier", email = "joel.maier@uni-rostock.de" }
+]
+dependencies = [
+    "numpy",
+    "scipy"
+]
+requires-python = ">=3.11"
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: POSIX :: Linux",
+    "Operating System :: MacOS",
+    "Operating System :: Microsoft :: Windows :: Windows 11",
+    "Intended Audience :: Science/Research",
+    "Topic :: Scientific/Engineering",
+    "Programming Language :: Python",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Typing :: Typed",
+    "Development Status :: 4 - Beta"
+]
+keywords = [
+    "scattering",
+    "small-angle scattering",
+    "SAS",
+    "dynamic light scattering",
+    "DLS",
+    "light scattering",
+    "particle analysis",
+    "particle mixture",
+    "scattering functions",
+    "form factors",
+    "structure factors",
+    "scattering experiments",
+    "scientific computing",
+    "scientific analysis",
+    "scientific visualization",
+    "physical chemistry",
+    "materials science",
+    "research tools",
+    "data analysis",
+]
+
+[project.optional-dependencies]
+tests = ["pytest", "pytest-cov", "pytest-mock"]
+lint = ["ruff"]
+type-check = ["mypy", "mypy-einsum", "types-PyYAML"]
+docs = ["mkdocs", "mkdocstrings[python]", "mkdocs-material"]
+example = ["matplotlib"]
+dev = ["mixscatter[tests, lint, type-check, docs, example]", "pre-commit", "nox"]
+
+[project.urls]
+"Homepage" = "https://github.com/joelmaier/mixscatter"
+
+[tool.ruff]
+line-length = 120
+
+[tool.mypy]
+strict = true
+python_version = "3.12"
+ignore_missing_imports = true
+plugins = ["numpy.typing.mypy_plugin", "mypy_einsum"]
+
+[tool.pytest.ini_options]
+minversion = "6.0"
+addopts = "--strict-markers --tb=short --disable-warnings"
+testpaths = [
+    "tests"
+]
+
+[tool.coverage.run]
+branch = true
+source = [
+    "mixscatter"
+]
+
+[tool.coverage.report]
+show_missing = true
+skip_covered = true

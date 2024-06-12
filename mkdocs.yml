@@ -1,0 +1,68 @@
+site_name: mixscatter
+site_url: ""
+use_directory_urls: false
+
+copyright: Copyright &copy; 2024 Joel Diaz Maier
+
+nav:
+  - Welcome: index.md
+  - Getting Started:
+    - Introduction: getting_started/getting-started.md
+    - Mixtures: getting_started/mixtures.md
+    - Scattering models: getting_started/scattering-models.md
+    - Liquid Structure: getting_started/liquid-structure.md
+  - API Reference:
+    - mixscatter: api/core_api.md
+    - mixture: api/mixture_api.md
+    - scatteringmodel: api/scatteringmodel_api.md
+    - liquidstructure: api/liquidstructure_api.md
+  - Background: background.md
+
+theme:
+  palette:
+    # Palette toggle for dark mode
+    - media: "(prefers-color-scheme: dark)"
+      scheme: slate
+      toggle:
+        icon: material/brightness-4
+        name: Switch to light mode
+    # Palette toggle for light mode
+    - media: "(prefers-color-scheme: light)"
+      scheme: default
+      toggle:
+        icon: material/brightness-7
+        name: Switch to dark mode
+  name: "material"
+  features:
+    - content.code.copy
+    - navigation.tabs
+    - navigation.tabs.sticky
+    - toc.follow
+    - navigation.top
+    - search.suggest
+    - search.highlight
+    - search.share
+    - navigation.footer
+
+plugins:
+  - search
+  - autorefs
+  - mkdocstrings:
+      handlers:
+        python:
+          options:
+            show_root_heading: true
+            docstring_style: 'google'
+
+markdown_extensions:
+  - pymdownx.arithmatex:
+      generic: true
+  - pymdownx.highlight:
+      anchor_linenums: true
+      use_pygments: true
+  - pymdownx.superfences
+
+extra_javascript:
+  - javascripts/mathjax.js
+  - https://polyfill.io/v3/polyfill.min.js?features=es6
+  - https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js
