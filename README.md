@@ -7,10 +7,9 @@
 [![Test](https://github.com/joelmaier/mixscatter/actions/workflows/test.yml/badge.svg)](https://github.com/joelmaier/mixscatter/actions/workflows/test.yml)
 [![Lint](https://github.com/joelmaier/mixscatter/actions/workflows/lint.yml/badge.svg)](https://github.com/joelmaier/mixscatter/actions/workflows/lint.yml)
 [![Type Check](https://github.com/joelmaier/mixscatter/actions/workflows/type_check.yml/badge.svg)](https://github.com/joelmaier/mixscatter/actions/workflows/type_check.yml)
+[![Docs](https://github.com/joelmaier/mixscatter/actions/workflows/docs.yml/badge.svg)](https://github.com/joelmaier/mixscatter/actions/workflows/docs.yml)
 [![Nox](https://img.shields.io/badge/%F0%9F%A6%8A-Nox-D85E00.svg)](https://github.com/wntrblm/nox)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT)
-
-UNDER CONSTRUCTION
 
 ## Table of Contents
 * [Overview](#overview)
@@ -22,14 +21,14 @@ UNDER CONSTRUCTION
 
 ## Overview
 
-`mixscatter` is a pure python package for the calculation of scattering functions of
+**mixscatter** is a pure python package for the calculation of scattering functions of
 multi-component mixtures of interacting spherical scatterers in the Born approximation
 ([Rayleigh-Gans-Debye scattering](https://en.wikipedia.org/wiki/Rayleigh-Gans_approximation)).
 
 The code provides tools to calculate scattering amplitudes, measurable intensities, form and
 structure factors of particle mixtures with a strong focus on the flexible construction of
 systems with arbitrary compositions and particles with potentially complex scattering length
-density profiles. The development of `mixscatter` was motivated by the need of a flexible
+density profiles. The development of **mixscatter** was motivated by the need of a flexible
 tool to characterize particulate systems which cannot be treated within effective
 single-component approximations.
 
@@ -48,16 +47,23 @@ Take a look at these publications if you are interested:
 
 ## Installation
 
-TBA
+Publishing the package on PyPi is planned for the future. For now, you can install **mixscatter**
+via `pip` directly from the GitHub repository:
+
+```shell
+pip install git+https://github.com/joelmaier/mixscatter.git
+```
 
 ## Documentation
 
-TBA
+Find the documentation on GitHub Pages: https://joelmaier.github.io/mixscatter/
 
 ## Example Showcase
 
-This example demonstrates the fundamental capabilities of `mixscatter`. Take a look at the
-Getting Started Guide in the documentation for a comprehensive walk-through.
+This example demonstrates the fundamental capabilities of **mixscatter**. Take a look at the
+[Getting Started Guide](
+https://joelmaier.github.io/mixscatter/getting_started/getting-started.html) 
+in the documentation for a comprehensive walk-through.
 
 ```python
 import numpy as np
@@ -154,7 +160,7 @@ if __name__ == "__main__":
     fig.savefig("simple_example_figure.png", dpi=300)
 ```
 
-![Alt](examples/simple_example_figure.png "Test")
+![Example Figure](examples/simple_example_figure.png "Example figure")
 
 ## Contributing
 
@@ -163,4 +169,4 @@ Pull requests are of course also welcome.
 
 ## License
 
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
