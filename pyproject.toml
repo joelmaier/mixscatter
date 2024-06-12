@@ -60,7 +60,8 @@ example = ["matplotlib"]
 dev = ["mixscatter[tests, lint, type-check, docs, example]", "pre-commit", "nox"]
 
 [project.urls]
-"Homepage" = "https://github.com/joelmaier/mixscatter"
+Repository = "https://github.com/joelmaier/mixscatter"
+Documentation = "https://joelmaier.github.io/mixscatter"
 
 [tool.ruff]
 line-length = 120
