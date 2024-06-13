@@ -55,11 +55,11 @@ def test_constant_profile(wavevector, distance):
     forward_amplitude = profile.calculate_forward_amplitude()
     layer_profile = profile.get_profile(distance)
 
-    expected_forward_amplitude = 4.0 / 3.0 * np.pi * (1.0 ** 3 - 0.0 ** 3)
+    expected_forward_amplitude = 4.0 / 3.0 * np.pi * (1.0**3 - 0.0**3)
 
     assert_array_almost_equal(amplitude, np.array([4.185, 3.785, 0.099]), decimal=3)
     assert np.isclose(forward_amplitude, expected_forward_amplitude, atol=1e-5)
-    assert_array_almost_equal(layer_profile, np.array([1.0, 1.0, 1.0, 0.0]), decimal=3)
+    assert_array_almost_equal(layer_profile, np.array([1.0, 1.0, 0.0, 0.0]), decimal=3)
 
 
 def test_constant_profile_invalid_radius():
@@ -73,11 +73,11 @@ def test_linear_profile(wavevector, distance):
     forward_amplitude = profile.calculate_forward_amplitude()
     layer_profile = profile.get_profile(distance)
 
-    expected_forward_amplitude = 4.0 / 3.0 * np.pi * (1.0 ** 3 - 0.0 ** 3) + np.pi * (1.0 ** 4 - 0.0 ** 4)
+    expected_forward_amplitude = 4.0 / 3.0 * np.pi * (1.0**3 - 0.0**3) + np.pi * (1.0**4 - 0.0**4)
 
     assert_array_almost_equal(amplitude, np.array([7.323, 6.590, 0.186]), decimal=3)
     assert np.isclose(forward_amplitude, expected_forward_amplitude, atol=1e-5)
-    assert_array_almost_equal(layer_profile, np.array([1.1, 1.5, 2.0, 0.0]), decimal=3)
+    assert_array_almost_equal(layer_profile, np.array([1.1, 1.5, 0.0, 0.0]), decimal=3)
 
 
 def test_linear_profile_invalid_radius():
@@ -85,7 +85,7 @@ def test_linear_profile_invalid_radius():
         LinearProfile(1, 0, 1.0, 2.0)
 
 
-def test_particle(wavevector, distance):
+def test_particle(wavevector):
     profile1 = ConstantProfile(0, 1, 1.0)
     profile2 = LinearProfile(1, 2, 1.0, 2.0)
     particle = Particle([profile1, profile2])
@@ -93,12 +93,13 @@ def test_particle(wavevector, distance):
     amplitude = particle.calculate_amplitude(wavevector)
     forward_amplitude = particle.calculate_forward_amplitude()
     form_factor = particle.calculate_form_factor(wavevector)
+    distance = np.array([0, 1, 1.5, 2, 10])
     layer_profile = particle.get_profile(distance)
 
     assert_array_almost_equal(amplitude, np.array([51.089, 32.012, -0.149]), decimal=3)
     assert np.isclose(forward_amplitude, 51.313, atol=1e-3)
     assert_array_almost_equal(form_factor, np.array([9.913e-01, 3.892e-01, 8.462e-06]), decimal=3)
-    assert_array_almost_equal(layer_profile, np.array([1.0, 1.0, 2.0, 0.0]), decimal=3)
+    assert_array_almost_equal(layer_profile, np.array([1.0, 1.0, 1.5, 0.0, 0.0]), decimal=3)
 
 
 def test_particle_layer_connection():
@@ -108,10 +109,7 @@ def test_particle_layer_connection():
     profile4 = EmptyProfile(3, 4)
     particle = Particle([profile1, profile2, profile3, profile4])
 
-    assert_array_almost_equal(
-        particle.get_profile([1.0, 2.0, 3.0]),
-        np.array([1.0, 5.0, 0.0])
-    )
+    assert_array_almost_equal(particle.get_profile([1.0, 2.0, 3.0]), np.array([1.0, 5.0, 0.0]))
 
 
 def test_particle_builder():
