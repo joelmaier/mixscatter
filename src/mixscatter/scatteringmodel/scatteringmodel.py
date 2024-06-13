@@ -151,7 +151,7 @@ class ConstantProfile(LayerProfile):
             The profile evaluated on the distance array.
         """
         distance = np.asarray(distance)
-        distance_mask = (distance >= self.radius_inner) & (distance <= self.radius_outer)
+        distance_mask = (distance >= self.radius_inner) & (distance < self.radius_outer)
         return np.where(distance_mask, self.contrast, 0.0)
 
 
@@ -222,7 +222,7 @@ class LinearProfile(LayerProfile):
             The profile evaluated on the distance array.
         """
         distance = np.asarray(distance)
-        distance_mask = (distance >= self.radius_inner) & (distance <= self.radius_outer)
+        distance_mask = (distance >= self.radius_inner) & (distance < self.radius_outer)
         intercept, slope = self._two_point_to_slope_intercept(
             self.radius_inner, self.contrast_inner, self.radius_outer, self.contrast_outer
         )
