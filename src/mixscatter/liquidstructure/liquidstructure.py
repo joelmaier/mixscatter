@@ -84,7 +84,7 @@ class LiquidStructure(ABC):
             wavevector (ArrayLike): Scattering wavevector.
             mixture (MixtureLike): Mixture object.
         """
-        self.wavevector: NDArray[np.float_] = np.asarray(wavevector)
+        self.wavevector: NDArray[np.float_] = np.asarray(wavevector, dtype=np.float_)
         self.mixture: MixtureLike = mixture
 
     @abstractmethod
