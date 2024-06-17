@@ -2,7 +2,9 @@ The [`scatteringmodel`](../api/scatteringmodel_api.md#mixscatter.scatteringmodel
 provides tools to calculate scattering amplitudes and form factors of multicomponent systems 
 consisting of spherical particles.
 
-## Particles and Layers
+## Overview
+
+### Particles and Layers
 
 Particles are represented by [`Particle`](
 ../api/scatteringmodel_api.md#mixscatter.scatteringmodel.Particle)
@@ -22,7 +24,7 @@ interface. The module includes several predefined layer profiles:
   ../api/scatteringmodel_api.md#mixscatter.scatteringmodel.LinearProfile): Represents a
   layer with linearly varying contrast.
 
-## ParticleBuilder
+### ParticleBuilder
 
 The [`ParticleBuilder`](
 ../api/scatteringmodel_api.md#mixscatter.scatteringmodel.ParticleBuilder) class is a
@@ -30,14 +32,14 @@ utility to help construct particles layer by layer. Once the desired layers are 
 [`Particle`](
 ../api/scatteringmodel_api.md#mixscatter.scatteringmodel.Particle) instance can be created.
 
-## ScatteringModel
+### ScatteringModel
 
 The [`ScatteringModel`](
 ../api/scatteringmodel_api.md#mixscatter.scatteringmodel.ScatteringModel) class
 calculates scattering properties for a list of particles. It can compute various properties such
 as scattering amplitudes, forward scattering amplitudes, and form factors.
 
-## Convenience Classes
+### Convenience Classes
 
 There are several convenience classes provided to quickly create models for common scenarios
 from a given [particle mixture](mixtures.md):
@@ -78,11 +80,42 @@ builder.add_layer(LinearProfile(10, 20, 1.0, 0.0))
 particle = builder.get_particle()
 ```
 
+You can do the construction in a single command by chaining the operations like this:
+```python
+builder = ParticleBuilder()
+particle = (
+            builder
+            .add_layer(ConstantProfile(0, 10, 1.0))
+            .add_layer(LinearProfile(10, 20, 1.0, 0.0))
+            .get_particle()
+           )
+```
+
+### Accessing Single-Particle Properties
+
+The [`Particle`](
+../api/scatteringmodel_api.md#mixscatter.scatteringmodel.Particle) class provides methods for
+displaying the scattering length density profile and for calculating the scattering amplitude and 
+the formfactor of a single constructed particle:
+
+```python
+profile = particle.get_profile(distance)
+
+amplitude = particle.calculate_amplitude(wavevector)
+
+forward_amplitude = particle.calculate_forward_amplitude()
+
+form_factor = particle.calculate_form_factor(wavevector)
+```
+
 ### Using `ScatteringModel`
 
 The [`ScatteringModel`](
 ../api/scatteringmodel_api.md#mixscatter.scatteringmodel.ScatteringModel) class
-calculates the scattering properties from a list of particles. Here’s an example of how to use it:
+calculates the scattering properties from a list of particles and a matching [`Mixture`](
+../api/mixture_api.md#mixscatter.mixture.Mixture
+) instance.
+Here’s an example of how to use it:
 
 ```python
 import numpy as np
@@ -95,6 +128,7 @@ mixture = Mixture(radius=[1.0, 2.0], number_fraction=[0.5, 0.5])
 
 # Create particles using ParticleBuilder
 builder = ParticleBuilder()
+# pop_particle() obtains the constructed particle and then resets the builder
 particles = [
     builder.add_layer(ConstantProfile(0, radius, 1.0)).pop_particle()
     for radius in mixture.radius
@@ -199,6 +233,7 @@ class CustomModel(ScatteringModel):
             particle = (
             particle_builder
             .add_layer(CustomProfile(0, radius, custom_param))
+            # Add as many layers as you want
             .pop_particle()
             )
             particles.append(particle)
