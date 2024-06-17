@@ -12,10 +12,10 @@ nav:
     - Scattering models: getting_started/scattering-models.md
     - Liquid Structure: getting_started/liquid-structure.md
   - API Reference:
-    - mixscatter: api/core_api.md
-    - mixture: api/mixture_api.md
-    - scatteringmodel: api/scatteringmodel_api.md
-    - liquidstructure: api/liquidstructure_api.md
+    - mixscatter API: api/core_api.md
+    - mixture API: api/mixture_api.md
+    - scatteringmodel API: api/scatteringmodel_api.md
+    - liquidstructure API: api/liquidstructure_api.md
   - Background: background.md
 
 theme:
