@@ -94,8 +94,6 @@ structure_factor = ms.measurable_structure_factor(
 #### Measurable Diffusion Coefficient
 
 ```python
-thermal_energy = 1.0
-viscosity = 1.0
 diffusion_coefficient = ms.measurable_diffusion_coefficient(
     scattering_model, thermal_energy=1.0, viscosity=1.0
 )
