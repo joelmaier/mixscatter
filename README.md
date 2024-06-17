@@ -118,9 +118,9 @@ if __name__ == "__main__":
     # Visualize individual and average form factor(s)
     for i, form_factor in enumerate(scattering_model.single_form_factor):
         ax[1, 0].plot(wavevector, form_factor, label=f"particle {i + 1}")
-        ax[1, 0].plot(
-            wavevector, scattering_model.average_form_factor, label="average"
-        )
+    ax[1, 0].plot(
+        wavevector, scattering_model.average_form_factor, label="average"
+    )
     ax[1, 0].set_yscale("log")
     ax[1, 0].set_ylim(1e-6, 3e0)
     ax[1, 0].legend()
