@@ -119,7 +119,7 @@ def measurable_structure_factor(liquid_structure: LiquidStructureLike, scatterin
         >>> liquid_structure = ms.liquidstructure.PercusYevick(wavevector, mixture, volume_fraction_total=0.3)
         >>> scattering_model = ms.scatteringmodel.SimpleSphere(wavevector, mixture, contrast=1.0)
 
-        >>> S_M = measurable_structure_factor(liquid_structure, scattering_model)
+        >>> structure_factor = measurable_structure_factor(liquid_structure, scattering_model)
     """
     return measurable_intensity(liquid_structure, scattering_model) / scattering_model.average_form_factor
 

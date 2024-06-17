@@ -42,13 +42,20 @@ Very basic information and a couple of equations for the interested reader are g
 
 ## Installation
 
-TBA
+Publishing the package on PyPi is planned for the future. For now, you can install **mixscatter**
+via `pip` directly from the GitHub repository:
+
+```shell
+pip install git+https://github.com/joelmaier/mixscatter.git
+```
+
+Note that you need a working [git](https://www.git-scm.com/) installation.
 
 ## Getting Started
 
 For detailed instructions on how to use **mixscatter**, refer to the 
-[Getting Started Guide](getting_started/getting-started.md)
+[Getting Started Guide](getting_started/getting-started.md).
 
-## Documentation
+## API Reference
 Explore detailed information on all functions, classes, and modules in the 
-[API Reference](api/core_api.md)
+[API Reference](api/core_api.md).
