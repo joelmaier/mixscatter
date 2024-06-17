@@ -28,8 +28,8 @@ import numpy as np
 from mixscatter.liquidstructure import PercusYevick
 from mixscatter.mixture import Mixture
 
-wavevector = np.linspace(0.1, 10, 100)
-mixture = Mixture([0.5, 0.5], [1.0, 2.0])
+wavevector = np.linspace(0.01, 1, 100)
+mixture = Mixture([5.0, 10.0], [0.5, 0.5])
 volume_fraction_total = 0.3
 
 # Initialize the PercusYevick model
@@ -98,7 +98,7 @@ class MyLiquidStructure:
     def __init__(self, structure_factor_input):
         self.number_weighted_partial_structure_factor = structure_factor_input
 
-my_liquid_structure = MyLiquidStructure(structure_factors)
+my_liquid_structure = MyLiquidStructure(my_structure_factors)
 
 
 # Calculate scattered intensity
