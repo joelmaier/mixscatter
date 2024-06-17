@@ -42,7 +42,14 @@ Very basic information and a couple of equations for the interested reader are g
 
 ## Installation
 
-TBA
+Publishing the package on PyPi is planned for the future. For now, you can install **mixscatter**
+via `pip` directly from the GitHub repository:
+
+```shell
+pip install git+https://github.com/joelmaier/mixscatter.git
+```
+
+Note that you need a working [git](https://www.git-scm.com/) installation.
 
 ## Getting Started
 
