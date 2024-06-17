@@ -54,8 +54,8 @@ Note that you need a working [git](https://www.git-scm.com/) installation.
 ## Getting Started
 
 For detailed instructions on how to use **mixscatter**, refer to the 
-[Getting Started Guide](getting_started/getting-started.md)
+[Getting Started Guide](getting_started/getting-started.md).
 
-## Documentation
+## API Reference
 Explore detailed information on all functions, classes, and modules in the 
-[API Reference](api/core_api.md)
+[API Reference](api/core_api.md).
