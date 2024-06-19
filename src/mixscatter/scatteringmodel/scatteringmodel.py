@@ -40,7 +40,12 @@ Examples:
 """
 
 from functools import cached_property
-from typing import Any, Protocol, Self
+from typing import Any, Protocol
+
+try:
+    from typing import Self
+except ImportError:
+    from typing_extensions import Self
 
 import numpy as np
 from numpy.typing import ArrayLike, NDArray

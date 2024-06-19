@@ -50,7 +50,7 @@ https://pypi.org/project/mixscatter).
 
 ### Prerequisites
 
-Ensure you have Python 3.11 or higher installed.
+Ensure you have Python 3.10 or higher installed.
 
 ### Using pip
 
