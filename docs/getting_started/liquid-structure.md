@@ -80,7 +80,7 @@ protocol.
 class LiquidStructureLike(Protocol):
     """A protocol which defines an interface for a class which behaves like LiquidStructure"""
     @property
-    def number_weighted_partial_structure_factor(self) -> NDArray[np.float_]: ...
+    def number_weighted_partial_structure_factor(self) -> NDArray[np.float64]: ...
 ```
 
 The only thing this object needs is a property named `number_weighted_partial_structure_factor` 

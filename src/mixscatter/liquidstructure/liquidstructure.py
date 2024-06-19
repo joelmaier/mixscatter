@@ -31,8 +31,8 @@ class MixtureLike(Protocol):  # pragma: no cover
     A protocol defining the interface for mixture-like objects.
 
     Properties:
-        number_fraction (NDArray[np.float_]): Number fractions of the components in the mixture.
-        radius (NDArray[np.float_]): Radii of the components in the mixture.
+        number_fraction (NDArray[np.float64]): Number fractions of the components in the mixture.
+        radius (NDArray[np.float64]): Radii of the components in the mixture.
         number_of_components (int): The number of different components in the mixture.
 
     Methods:
@@ -40,10 +40,10 @@ class MixtureLike(Protocol):  # pragma: no cover
     """
 
     @property
-    def number_fraction(self) -> NDArray[np.float_]: ...
+    def number_fraction(self) -> NDArray[np.float64]: ...
 
     @property
-    def radius(self) -> NDArray[np.float_]: ...
+    def radius(self) -> NDArray[np.float64]: ...
 
     @radius.setter
     def radius(self, radius_array: ArrayLike) -> Any: ...
@@ -63,7 +63,7 @@ class LiquidStructure(ABC):
     'partial_direct_correlation_function' attribute.
 
     Attributes:
-        wavevector (NDArray[np.float_]): Scattering wavevector.
+        wavevector (NDArray[np.float64]): Scattering wavevector.
         mixture (MixtureLike): Mixture object.
 
     References:
@@ -84,17 +84,17 @@ class LiquidStructure(ABC):
             wavevector (ArrayLike): Scattering wavevector.
             mixture (MixtureLike): Mixture object.
         """
-        self.wavevector: NDArray[np.float_] = np.asarray(wavevector, dtype=np.float_)
+        self.wavevector: NDArray[np.float64] = np.asarray(wavevector, dtype=np.float64)
         self.mixture: MixtureLike = mixture
 
     @abstractmethod
     @cached_property
-    def partial_direct_correlation_function(self) -> NDArray[np.float_]:  # pragma: no cover
+    def partial_direct_correlation_function(self) -> NDArray[np.float64]:  # pragma: no cover
         """
         Matrix of the partial direct correlation functions weighted by the total number density.
 
         Returns:
-            NDArray[np.float_]: Partial direct correlation function matrix.
+            NDArray[np.float64]: Partial direct correlation function matrix.
         """
         ...
 
@@ -105,7 +105,7 @@ class LiquidStructure(ABC):
         product of the number fractions `x_i` and `x_j`.
 
         Returns:
-            NDArray[np.float_]: Matrix of the weighted direct partial correlation functions.
+            NDArray[np.float64]: Matrix of the weighted direct partial correlation functions.
         """
         c_weighted_ijq = np.einsum(
             "i, ijq, j->ijq",
@@ -117,12 +117,12 @@ class LiquidStructure(ABC):
         return c_weighted_ijq
 
     @cached_property
-    def partial_structure_factor(self) -> NDArray[np.float_]:
+    def partial_structure_factor(self) -> NDArray[np.float64]:
         """
         The partial structure factor matrix.
 
         Returns:
-            NDArray[np.float_]: Matrix of the partial structure factors.
+            NDArray[np.float64]: Matrix of the partial structure factors.
         """
         c_weighted_ijq = self.number_weighted_partial_direct_correlation_function
         c_weighted_qij = np.moveaxis(c_weighted_ijq, -1, 0)
@@ -139,7 +139,7 @@ class LiquidStructure(ABC):
         product of the number fractions `x_i` and `x_j`.
 
         Returns:
-            NDArray[np.float_]: Matrix of the weighted direct partial correlation functions.
+            NDArray[np.float64]: Matrix of the weighted direct partial correlation functions.
         """
         S_weighted_ijq = np.einsum(
             "i, ijq, j->ijq",
@@ -158,7 +158,7 @@ class LiquidStructure(ABC):
         The number-number structure factor for all species, regardless their individual size.
 
         Returns:
-            NDArray[np.float_]: Average structure factor.
+            NDArray[np.float64]: Average structure factor.
         """
         return np.einsum("ijq->q", self.number_weighted_partial_structure_factor)
 
@@ -171,7 +171,7 @@ class LiquidStructure(ABC):
         to the Kirkwood-Buff-theory for multicomponent systems.
 
         Returns:
-            NDArray[np.float_]: "Compressibility" structure factor.
+            NDArray[np.float64]: "Compressibility" structure factor.
         """
         S_weighted_ijq = self.number_weighted_partial_structure_factor
         S_weighted_qij = np.moveaxis(S_weighted_ijq, -1, 0)
@@ -217,7 +217,7 @@ class PercusYevick(LiquidStructure):
         Percus-Yevick approximation.
 
         Returns:
-            NDArray[np.float_]: Partial direct correlation function matrix `c_ij(q)` times the total number density.
+            NDArray[np.float64]: Partial direct correlation function matrix `c_ij(q)` times the total number density.
         """
         average_volume = 4.0 / 3.0 * np.pi * self.mixture.moment(3)
         number_density_total = self.volume_fraction_total / average_volume

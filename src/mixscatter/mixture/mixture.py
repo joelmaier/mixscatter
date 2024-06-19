@@ -40,8 +40,8 @@ class Mixture:
     """
 
     def __init__(self, radius: ArrayLike, number_fraction: ArrayLike, normalize_number_fraction: bool = True) -> None:
-        self._radius: NDArray[np.float_] = np.asarray(radius, dtype=np.float_)
-        self._number_fraction: NDArray[np.float_] = np.asarray(number_fraction, dtype=np.float_)
+        self._radius: NDArray[np.float64] = np.asarray(radius, dtype=np.float64)
+        self._number_fraction: NDArray[np.float64] = np.asarray(number_fraction, dtype=np.float64)
 
         if normalize_number_fraction:
             self._number_fraction /= np.sum(self._number_fraction)
@@ -49,7 +49,7 @@ class Mixture:
         self._number_of_components: int = len(self._radius)
 
     @property
-    def radius(self) -> NDArray[np.float_]:
+    def radius(self) -> NDArray[np.float64]:
         """
         Get an array of the radii of each component.
 
@@ -66,13 +66,13 @@ class Mixture:
         Args:
             radius_array: New radius array of the same shape as the current radius array.
         """
-        new_array: NDArray[np.float_] = np.asarray(radius_array, dtype=np.float_)
+        new_array: NDArray[np.float64] = np.asarray(radius_array, dtype=np.float64)
         if self._radius.shape != new_array.shape:
             raise ValueError("The new radius array must be of same shape as the current radius array.")
         self._radius = new_array
 
     @property
-    def number_fraction(self) -> NDArray[np.float_]:
+    def number_fraction(self) -> NDArray[np.float64]:
         """
         Get an array of the number fractions of each component
 
@@ -89,7 +89,7 @@ class Mixture:
         Args:
             number_fraction_array:
         """
-        new_array: NDArray[np.float_] = np.asarray(number_fraction_array, dtype=np.float_)
+        new_array: NDArray[np.float64] = np.asarray(number_fraction_array, dtype=np.float64)
         if self._number_fraction.shape != new_array.shape:
             raise ValueError("The new radius array must be of same shape as the current radius array.")
         self._number_fraction = new_array
@@ -187,14 +187,14 @@ class FlorySchulzMixture(Mixture):
     @classmethod
     def _flory_schulz_weights(
         cls, number_of_components: int, mean_radius: float, shape_parameter: float
-    ) -> tuple[NDArray[np.float_], NDArray[np.float_]]:
+    ) -> tuple[NDArray[np.float64], NDArray[np.float64]]:
         roots, weights = cls._generalized_laguerre_weights(number_of_components, shape_parameter)
         scaled_roots = roots * mean_radius / (shape_parameter + 1.0)
         weights /= np.sum(weights)
         return scaled_roots, weights
 
     @staticmethod
-    def _generalized_laguerre_weights(order: int, exponent: float) -> tuple[NDArray[np.float_], NDArray[np.float_]]:
+    def _generalized_laguerre_weights(order: int, exponent: float) -> tuple[NDArray[np.float64], NDArray[np.float64]]:
         roots, *_ = roots_genlaguerre(order, exponent)
         values_at_roots = eval_genlaguerre(order + 1, exponent, roots)
         abs_values_at_roots = np.abs(values_at_roots)
@@ -253,7 +253,7 @@ class GaussianMixture(Mixture):
     @staticmethod
     def _gaussian_weights(
         number_of_components: int, mean_radius: float, standard_deviation: float
-    ) -> tuple[NDArray[np.float_], NDArray[np.float_]]:
+    ) -> tuple[NDArray[np.float64], NDArray[np.float64]]:
         roots, weights = roots_hermite(number_of_components)
         scaled_roots = roots * np.sqrt(2) * standard_deviation + mean_radius
         weights /= np.sum(weights)
@@ -276,7 +276,7 @@ class UniformMixture(Mixture):
     @staticmethod
     def _uniform_weights(
         number_of_components: int, lower_bound: float, upper_bound: float
-    ) -> tuple[NDArray[np.float_], NDArray[np.float_]]:
+    ) -> tuple[NDArray[np.float64], NDArray[np.float64]]:
         roots, weights = roots_legendre(number_of_components)
         scaled_roots = upper_bound * 0.5 * (roots + 1) - lower_bound * 0.5 * (roots - 1)
         weights /= np.sum(weights)

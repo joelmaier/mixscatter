@@ -49,10 +49,10 @@ from numpy.typing import ArrayLike, NDArray
 # noinspection PyPropertyDefinition
 class MixtureLike(Protocol):  # pragma: no cover
     @property
-    def number_fraction(self) -> NDArray[np.float_]: ...
+    def number_fraction(self) -> NDArray[np.float64]: ...
 
     @property
-    def radius(self) -> NDArray[np.float_]: ...
+    def radius(self) -> NDArray[np.float64]: ...
 
 
 class LayerProfile(Protocol):  # pragma: no cover
@@ -61,7 +61,7 @@ class LayerProfile(Protocol):  # pragma: no cover
     radius_inner: float
     radius_outer: float
 
-    def calculate_amplitude(self, wavevector: ArrayLike) -> NDArray[np.float_]:
+    def calculate_amplitude(self, wavevector: ArrayLike) -> NDArray[np.float64]:
         """Calculate the amplitude for the given wavevector."""
         ...
 
@@ -69,7 +69,7 @@ class LayerProfile(Protocol):  # pragma: no cover
         """Calculate the forward amplitude."""
         ...
 
-    def get_profile(self, distance: ArrayLike) -> NDArray[np.float_]:
+    def get_profile(self, distance: ArrayLike) -> NDArray[np.float64]:
         """Get the profile for the given distance from the origin."""
         ...
 
@@ -84,13 +84,13 @@ class EmptyProfile(LayerProfile):
         self.radius_inner = radius_inner
         self.radius_outer = radius_outer
 
-    def calculate_amplitude(self, wavevector: ArrayLike) -> NDArray[np.float_]:
+    def calculate_amplitude(self, wavevector: ArrayLike) -> NDArray[np.float64]:
         """Calculate the amplitude for the given wavevector.
 
         Returns:
             A zero array of the same shape as the wavevector.
         """
-        wavevector = np.asarray(wavevector, dtype=np.float_)
+        wavevector = np.asarray(wavevector, dtype=np.float64)
         return np.zeros_like(wavevector)
 
     def calculate_forward_amplitude(self) -> float:
@@ -101,13 +101,13 @@ class EmptyProfile(LayerProfile):
         """
         return 0.0
 
-    def get_profile(self, distance: ArrayLike) -> NDArray[np.float_]:
+    def get_profile(self, distance: ArrayLike) -> NDArray[np.float64]:
         """Get the profile for the given distance from the origin.
 
         Returns:
             A zero array of the same shape as the distance.
         """
-        distance = np.asarray(distance, dtype=np.float_)
+        distance = np.asarray(distance, dtype=np.float64)
         return np.zeros_like(distance)
 
 
@@ -122,16 +122,16 @@ class ConstantProfile(LayerProfile):
         self.radius_outer = radius_outer
         self.contrast = contrast
 
-    def calculate_amplitude(self, wavevector: ArrayLike) -> NDArray[np.float_]:
+    def calculate_amplitude(self, wavevector: ArrayLike) -> NDArray[np.float64]:
         """Calculate the amplitude for the given wavevector.
 
         Returns:
             The calculated amplitude array.
         """
-        wavevector = np.asarray(wavevector, dtype=np.float_)
+        wavevector = np.asarray(wavevector, dtype=np.float64)
         QR_outer = wavevector * self.radius_outer
         QR_inner = wavevector * self.radius_inner
-        amplitude: NDArray[np.float_] = np.sin(QR_outer) - QR_outer * np.cos(QR_outer)
+        amplitude: NDArray[np.float64] = np.sin(QR_outer) - QR_outer * np.cos(QR_outer)
         amplitude -= np.sin(QR_inner) - QR_inner * np.cos(QR_inner)
         amplitude *= 4.0 * np.pi / wavevector**3 * self.contrast
         return amplitude
@@ -144,13 +144,13 @@ class ConstantProfile(LayerProfile):
         """
         return 4.0 / 3.0 * np.pi * (self.radius_outer**3 - self.radius_inner**3) * self.contrast
 
-    def get_profile(self, distance: ArrayLike) -> NDArray[np.float_]:
+    def get_profile(self, distance: ArrayLike) -> NDArray[np.float64]:
         """Get the profile for the given distance from the origin.
 
         Returns:
             The profile evaluated on the distance array.
         """
-        distance = np.asarray(distance, dtype=np.float_)
+        distance = np.asarray(distance, dtype=np.float64)
         distance_mask = (distance >= self.radius_inner) & (distance < self.radius_outer)
         return np.where(distance_mask, self.contrast, 0.0)
 
@@ -167,13 +167,13 @@ class LinearProfile(LayerProfile):
         self.contrast_inner = contrast_inner
         self.contrast_outer = contrast_outer
 
-    def calculate_amplitude(self, wavevector: ArrayLike) -> NDArray[np.float_]:
+    def calculate_amplitude(self, wavevector: ArrayLike) -> NDArray[np.float64]:
         """Calculate the amplitude for the given wavevector.
 
         Returns:
             The calculated amplitude array.
         """
-        wavevector = np.asarray(wavevector, dtype=np.float_)
+        wavevector = np.asarray(wavevector, dtype=np.float64)
         QR_outer = wavevector * self.radius_outer
         QR_inner = wavevector * self.radius_inner
         intercept, slope = self._two_point_to_slope_intercept(
@@ -182,7 +182,7 @@ class LinearProfile(LayerProfile):
         amplitude_intercept = ConstantProfile(self.radius_inner, self.radius_outer, intercept).calculate_amplitude(
             wavevector
         )
-        amplitude_gradient: NDArray[np.float_] = (2.0 - QR_outer**2) * np.cos(QR_outer) + 2.0 * QR_outer * np.sin(
+        amplitude_gradient: NDArray[np.float64] = (2.0 - QR_outer**2) * np.cos(QR_outer) + 2.0 * QR_outer * np.sin(
             QR_outer
         )
         amplitude_gradient -= (2.0 - QR_inner**2) * np.cos(QR_inner) + 2.0 * QR_inner * np.sin(QR_inner)
@@ -215,13 +215,13 @@ class LinearProfile(LayerProfile):
         slope = (y_2 - y_1) / (x_2 - x_1)
         return intercept, slope
 
-    def get_profile(self, distance: ArrayLike) -> NDArray[np.float_]:
+    def get_profile(self, distance: ArrayLike) -> NDArray[np.float64]:
         """Get the profile for the given distance from the origin.
 
         Returns:
             The profile evaluated on the distance array.
         """
-        distance = np.asarray(distance, dtype=np.float_)
+        distance = np.asarray(distance, dtype=np.float64)
         distance_mask = (distance >= self.radius_inner) & (distance < self.radius_outer)
         intercept, slope = self._two_point_to_slope_intercept(
             self.radius_inner, self.contrast_inner, self.radius_outer, self.contrast_outer
@@ -237,13 +237,13 @@ class Particle:
     def __init__(self, layers: list[LayerProfile]) -> None:
         self.layers = layers
 
-    def calculate_amplitude(self, wavevector: ArrayLike) -> NDArray[np.float_]:
+    def calculate_amplitude(self, wavevector: ArrayLike) -> NDArray[np.float64]:
         """Calculate the amplitude for the given wavevector.
 
         Returns:
             The calculated amplitude array.
         """
-        wavevector = np.asarray(wavevector, dtype=np.float_)
+        wavevector = np.asarray(wavevector, dtype=np.float64)
         amplitude = np.zeros_like(wavevector)
         for layer in self.layers:
             amplitude += layer.calculate_amplitude(wavevector)
@@ -260,24 +260,24 @@ class Particle:
             forward_amplitude += layer.calculate_forward_amplitude()
         return forward_amplitude
 
-    def calculate_form_factor(self, wavevector: ArrayLike) -> NDArray[np.float_]:
+    def calculate_form_factor(self, wavevector: ArrayLike) -> NDArray[np.float64]:
         """Calculate the form factor for the given wavevector.
 
         Returns:
             The calculated form factor array.
         """
-        wavevector = np.asarray(wavevector, dtype=np.float_)
+        wavevector = np.asarray(wavevector, dtype=np.float64)
         amplitude = self.calculate_amplitude(wavevector)
         forward_amplitude = self.calculate_forward_amplitude()
         return (amplitude / forward_amplitude) ** 2
 
-    def get_profile(self, distance: ArrayLike) -> NDArray[np.float_]:
+    def get_profile(self, distance: ArrayLike) -> NDArray[np.float64]:
         """Get the profile for the given distance from the origin.
 
         Returns:
             The profile evaluated on the distance array.
         """
-        distance = np.asarray(distance, dtype=np.float_)
+        distance = np.asarray(distance, dtype=np.float64)
         profile = np.zeros_like(distance)
         for layer in self.layers:
             profile += layer.get_profile(distance)
@@ -339,12 +339,12 @@ class ScatteringModel:
     """Calculates scattering properties for a list of particles."""
 
     def __init__(self, wavevector: ArrayLike, mixture: MixtureLike, particles: list[Particle]):
-        self.wavevector = np.asarray(wavevector, dtype=np.float_)
+        self.wavevector = np.asarray(wavevector, dtype=np.float64)
         self.mixture = mixture
         self.particles = particles
 
     @cached_property
-    def amplitude(self) -> NDArray[np.float_]:
+    def amplitude(self) -> NDArray[np.float64]:
         """Calculate the amplitude for each particle.
 
         Returns:
@@ -356,7 +356,7 @@ class ScatteringModel:
         return amplitude
 
     @cached_property
-    def forward_amplitude(self) -> NDArray[np.float_]:
+    def forward_amplitude(self) -> NDArray[np.float64]:
         """Calculate the forward amplitude for each particle.
 
         Returns:
@@ -368,7 +368,7 @@ class ScatteringModel:
         return forward_amplitude
 
     @cached_property
-    def single_form_factor(self) -> NDArray[np.float_]:
+    def single_form_factor(self) -> NDArray[np.float64]:
         """The normalized form factors of the single species.
 
         Returns:

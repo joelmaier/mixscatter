@@ -14,10 +14,10 @@ __all__ = ["measurable_structure_factor", "measurable_intensity", "measurable_di
 
 class MixtureLike(Protocol):  # pragma: no cover
     @property
-    def radius(self) -> NDArray[np.float_]: ...
+    def radius(self) -> NDArray[np.float64]: ...
 
     @property
-    def number_fraction(self) -> NDArray[np.float_]: ...
+    def number_fraction(self) -> NDArray[np.float64]: ...
 
 
 # noinspection PyPropertyDefinition
@@ -25,7 +25,7 @@ class LiquidStructureLike(Protocol):  # pragma: no cover
     """A protocol which defines an interface for a class which behaves like LiquidStructure"""
 
     @property
-    def number_weighted_partial_structure_factor(self) -> NDArray[np.float_]: ...
+    def number_weighted_partial_structure_factor(self) -> NDArray[np.float64]: ...
 
 
 # noinspection PyPropertyDefinition
@@ -35,7 +35,7 @@ class ScatteringModelLike(Protocol):  # pragma: no cover
     mixture: MixtureLike
 
     @property
-    def amplitude(self) -> NDArray[np.float_]: ...
+    def amplitude(self) -> NDArray[np.float64]: ...
 
     @property
     def average_square_amplitude(self) -> Any: ...
