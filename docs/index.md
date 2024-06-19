@@ -8,7 +8,7 @@ hide:
 **mixscatter** is a versatile tool for calculating scattering 
 functions of particle mixtures, particularly for [small-angle scattering (SAS)](
 https://en.wikipedia.org/wiki/Small-angle_scattering)
-and [dynamic light scattering (DLS)](
+or [static and dynamic light scattering (SLS & DLS)](
 https://en.wikipedia.org/wiki/Dynamic_light_scattering) applications.
 
 ## Key Features
@@ -42,14 +42,12 @@ Very basic information and a couple of equations for the interested reader are g
 
 ## Installation
 
-Publishing the package on PyPi is planned for the future. For now, you can install **mixscatter**
-via `pip` directly from the GitHub repository:
-
+**mixscatter** is available at the [Python Package Index (PyPI)](
+https://pypi.org/project/mixscatter). You can install the package via `pip`:
 ```shell
-pip install git+https://github.com/joelmaier/mixscatter.git
+pip install mixscatter
 ```
-
-Note that you need a working [git](https://www.git-scm.com/) installation.
+The source code is currently hosted on GitHub at: <https://github.com/joelmaier/mixscatter>
 
 ## Getting Started
 

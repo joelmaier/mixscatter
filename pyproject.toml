@@ -5,10 +5,14 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "mixscatter"
 version = "0.0.1"
-description = "Scattering functions of particle mixtures."
+description = """\
+A versatile tool for calculating scattering functions of particle mixtures, \
+particularly for small-angle scattering (SAS) or static and dynamic light scattering (SLS & DLS) \
+applications.\
+"""
 readme = "README.md"
 authors = [
-    { name = "Joel Diaz Maier", email = "joel.maier@uni-rostock.de" }
+    { name = "Joel Diaz Maier", email = "joel.diazmaier@gmail.de" }
 ]
 dependencies = [
     "numpy~=1.26",
