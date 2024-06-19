@@ -25,12 +25,10 @@
 multi-component mixtures of interacting spherical scatterers in the Born approximation
 ([Rayleigh-Gans-Debye scattering](https://en.wikipedia.org/wiki/Rayleigh-Gans_approximation)).
 
-The code provides tools to calculate scattering amplitudes, measurable intensities, form and
-structure factors of particle mixtures with a strong focus on the flexible construction of
-systems with arbitrary compositions and particles with potentially complex scattering length
-density profiles. The development of **mixscatter** was motivated by the need of a flexible
-tool to characterize particulate systems which cannot be treated within effective
-single-component approximations.
+Key Features:
+* Calculation of scattering amplitudes, measurable intensities, form factors, structure factors, and diffusion coefficients.
+* Flexible construction of systems with arbitrary compositions and complex scattering length density profiles.
+* Suitable for researchers and developers working on particulate systems characterization.
 
 Take a look at these publications if you are interested:
 
@@ -46,8 +44,17 @@ Take a look at these publications if you are interested:
     [arXiv:2404.03470 [cond-mat.soft]](https://doi.org/10.48550/arXiv.2404.03470)
 
 ## Installation
-**mixscatter** is available at the [Python Package Index (PyPI)](
-https://pypi.org/project/mixscatter). You can install the package via `pip`:
+
+**mixscatter** is available on the [Python Package Index (PyPI)](
+https://pypi.org/project/mixscatter).
+
+### Prerequisites
+
+Ensure you have Python 3.11 or higher installed.
+
+### Using pip
+
+Install the package via pip:
 ```shell
 pip install mixscatter
 ```
@@ -59,10 +66,13 @@ Find the documentation on GitHub Pages: https://joelmaier.github.io/mixscatter/
 
 ## Example Showcase
 
-This example demonstrates the fundamental capabilities of **mixscatter**. Take a look at the
+This example demonstrates the fundamental capabilities of **mixscatter**. For a comprehensive 
+walk-through, refer to the
 [Getting Started Guide](
-https://joelmaier.github.io/mixscatter/getting_started/getting-started.html) 
-in the documentation for a comprehensive walk-through.
+https://joelmaier.github.io/mixscatter/getting_started/getting-started.html). 
+
+Run this code to
+produce the figure below.
 
 ```python
 import numpy as np
@@ -163,8 +173,8 @@ if __name__ == "__main__":
 
 ## Contributing
 
-If you find any bugs or want to request features, feel free to get in touch or create an issue.
-Pull requests are of course also welcome.
+Contributions are welcome! If you find any bugs or want to request features, 
+feel free to get in touch or create an issue.
 
 ## License
 

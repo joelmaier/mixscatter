@@ -8,7 +8,7 @@ hide:
 **mixscatter** is a versatile tool for calculating scattering 
 functions of particle mixtures, particularly for [small-angle scattering (SAS)](
 https://en.wikipedia.org/wiki/Small-angle_scattering)
-and [dynamic light scattering (DLS)](
+or [static and dynamic light scattering (SLS & DLS)](
 https://en.wikipedia.org/wiki/Dynamic_light_scattering) applications.
 
 ## Key Features
