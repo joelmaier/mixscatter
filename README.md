@@ -162,7 +162,7 @@ if __name__ == "__main__":
     fig.savefig("simple_example_figure.png", dpi=300)
 ```
 
-![Example Figure](examples/simple_example_figure.png "Example figure")
+![Example Figure](https://raw.githubusercontent.com/joelmaier/mixscatter/main/examples/simple_example_figure.png "Example figure")
 
 ## Contributing
 
@@ -171,4 +171,5 @@ Pull requests are of course also welcome.
 
 ## License
 
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+This project is licensed under the MIT License - see the [LICENSE](
+https://raw.githubusercontent.com/joelmaier/mixscatter/main/LICENSE) file for details.
