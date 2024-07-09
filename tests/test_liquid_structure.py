@@ -1,19 +1,19 @@
 # type: ignore
 import pytest
+from unittest.mock import create_autospec
 import numpy as np
 from numpy.testing import assert_array_almost_equal
 
-from mixscatter.liquidstructure import LiquidStructure, PercusYevick, VerletWeis
+from mixscatter.liquidstructure.liquidstructure import LiquidStructure, PercusYevick, VerletWeis, MixtureLike
 
 
 @pytest.fixture
 def mock_mixture(mocker):
-    mock_mixture = mocker.Mock()
+    mock_mixture = create_autospec(MixtureLike, instance=True)
     mock_mixture.number_fraction = np.array([0.5, 0.5])
     mock_mixture.radius = np.array([1.0, 2.0])
     mock_mixture.number_of_components = 2
     mock_mixture.moment.side_effect = lambda order: np.sum(mock_mixture.number_fraction * mock_mixture.radius**order)
-
     return mock_mixture
 
 

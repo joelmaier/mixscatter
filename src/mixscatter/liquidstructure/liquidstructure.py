@@ -1,5 +1,5 @@
 """
-Module `liquidstructure` provides classes for representing the liquid structure properties of
+This module provides classes for representing the liquid structure properties of
 interacting multicomponent systems of spherical particles.
 
 Classes:
@@ -19,13 +19,19 @@ References:
 
 from abc import ABC, abstractmethod
 from functools import cached_property
-from typing import Any, Protocol
+from typing import Any, Protocol, runtime_checkable
 
 import numpy as np
 from numpy.typing import ArrayLike, NDArray
 
 
+@runtime_checkable
+class HasMutableRadius(Protocol):
+    radius: NDArray[np.float64]
+
+
 # noinspection PyPropertyDefinition
+@runtime_checkable
 class MixtureLike(Protocol):  # pragma: no cover
     """
     A protocol defining the interface for mixture-like objects.
@@ -44,9 +50,6 @@ class MixtureLike(Protocol):  # pragma: no cover
 
     @property
     def radius(self) -> NDArray[np.float64]: ...
-
-    @radius.setter
-    def radius(self, radius_array: ArrayLike) -> Any: ...
 
     @property
     def number_of_components(self) -> int: ...
@@ -289,5 +292,13 @@ class VerletWeis(PercusYevick):
         """
         effective_volume_fraction = volume_fraction_total * (1.0 - volume_fraction_total / 16.0)
         effective_radius = mixture.radius * (effective_volume_fraction / volume_fraction_total) ** (1.0 / 3.0)
-        mixture.radius = effective_radius
+
+        # Some static type checkers at the moment cannot handle protocols implementing property setters
+        # and since a mutable radius property is only needed here, a manual isinstance assertion is performed
+        if isinstance(mixture, HasMutableRadius):
+            mixture.radius = effective_radius
+            assert isinstance(mixture, MixtureLike)
+        else:
+            raise TypeError("`radius` property of `mixture` must be mutable.")
+
         super().__init__(wavevector, mixture, volume_fraction_total=effective_volume_fraction)

@@ -1,9 +1,8 @@
 """
-Module `liquidstructure` provides classes for representing the liquid structure properties of
+This module provides classes for representing the liquid structure properties of
 interacting multicomponent systems of spherical particles.
 
 Classes:
-    MixtureLike: A protocol defining the expected interface for mixture-like objects.
     LiquidStructure: Abstract base class representing liquid structure properties.
     PercusYevick: Class for hard-sphere potential in the Percus-Yevick approximation.
     VerletWeis: Class for hard-sphere potential in the Percus-Yevick approximation

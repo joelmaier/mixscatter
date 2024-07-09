@@ -28,8 +28,28 @@ from mixscatter.core import (
     measurable_diffusion_coefficient,
     LiquidStructureLike,
     ScatteringModelLike,
+    MixtureLike,
 )
 from mixscatter import liquidstructure, scatteringmodel, mixture
+from mixscatter.mixture import (
+    Mixture,
+    FlorySchulzMixture,
+    GaussianMixture,
+    UniformMixture,
+    SingleComponent,
+)
+from mixscatter.liquidstructure import LiquidStructure, PercusYevick, VerletWeis
+from mixscatter.scatteringmodel import (
+    EmptyProfile,
+    ConstantProfile,
+    LinearProfile,
+    Particle,
+    ParticleBuilder,
+    ScatteringModel,
+    SimpleSphere,
+    SimpleCoreShell,
+    SimpleGradient,
+)
 
 __all__ = [
     "measurable_intensity",
@@ -37,6 +57,24 @@ __all__ = [
     "measurable_diffusion_coefficient",
     "LiquidStructureLike",
     "ScatteringModelLike",
+    "MixtureLike",
+    "FlorySchulzMixture",
+    "GaussianMixture",
+    "UniformMixture",
+    "SingleComponent",
+    "Mixture",
+    "LiquidStructure",
+    "PercusYevick",
+    "VerletWeis",
+    "ScatteringModel",
+    "SimpleSphere",
+    "SimpleCoreShell",
+    "SimpleGradient",
+    "EmptyProfile",
+    "ConstantProfile",
+    "LinearProfile",
+    "Particle",
+    "ParticleBuilder",
     "liquidstructure",
     "scatteringmodel",
     "mixture",
