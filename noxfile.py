@@ -4,7 +4,8 @@ import nox
 @nox.session
 def tests(session):  # type: ignore
     session.install(".[tests]")
-    session.run("pytest", "--cov=mixscatter", "--cov-report=xml", "tests/")
+    session.install("typing-extensions")
+    session.run("pytest", "--cov=mixscatter", "tests/")
 
 
 @nox.session

@@ -299,10 +299,14 @@ class VerletWeis(PercusYevick):
 
         # Some static type checkers at the moment cannot handle protocols implementing property setters
         # and since a mutable radius property is only needed here, a manual isinstance assertion is performed
-        if isinstance(mixture, HasMutableRadius):
+        # try:
+        #     mixture.radius = effective_radius
+        # except
+
+        if isinstance(mixture, HasMutableRadius) and getattr(type(mixture), "radius").fset is not None:
             mixture.radius = effective_radius
             assert isinstance(mixture, MixtureLike)
         else:
-            raise TypeError("`radius` property of `mixture` must be mutable.")
+            raise AttributeError("`radius` property of `mixture` must be mutable.")
 
         super().__init__(wavevector, mixture, volume_fraction_total=effective_volume_fraction)

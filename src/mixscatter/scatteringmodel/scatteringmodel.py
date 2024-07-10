@@ -78,6 +78,10 @@ class LayerProfile(Protocol):  # pragma: no cover
         """Get the profile for the given distance from the origin."""
         ...
 
+    def calculate_second_moment(self) -> float:
+        """Calculate the second moment."""
+        ...
+
 
 class EmptyProfile(LayerProfile):
     """
@@ -99,6 +103,9 @@ class EmptyProfile(LayerProfile):
 
         get_profile(distance):
             Get the profile for the given distance from the origin.
+
+        calculate_second_moment():
+            Calculate the second moment.
     """
 
     def __init__(self, radius_inner: float, radius_outer: float) -> None:
@@ -152,6 +159,14 @@ class EmptyProfile(LayerProfile):
         distance = np.asarray(distance, dtype=np.float64)
         return np.zeros_like(distance)
 
+    def calculate_second_moment(self) -> float:
+        """Calculate the second moment.
+
+        Returns:
+            Zero.
+        """
+        return 0.0
+
 
 class ConstantProfile(LayerProfile):
     """
@@ -174,6 +189,9 @@ class ConstantProfile(LayerProfile):
 
         get_profile(distance):
             Get the profile for the given distance from the origin.
+
+        calculate_second_moment():
+            Calculate the second moment.
     """
 
     def __init__(self, radius_inner: float, radius_outer: float, contrast: float) -> None:
@@ -234,6 +252,14 @@ class ConstantProfile(LayerProfile):
         distance_mask = (distance >= self.radius_inner) & (distance < self.radius_outer)
         return np.where(distance_mask, self.contrast, 0.0)
 
+    def calculate_second_moment(self) -> float:
+        """Calculate the second moment.
+
+        Returns:
+            The calculated second moment.
+        """
+        return 4.0 / 5.0 * np.pi * (self.radius_outer**5 - self.radius_inner**5) * self.contrast
+
 
 class LinearProfile(LayerProfile):
     """
@@ -257,6 +283,9 @@ class LinearProfile(LayerProfile):
 
         get_profile(distance):
             Get the profile for the given distance from the origin.
+
+        calculate_second_moment():
+            Calculate the second moment.
     """
 
     def __init__(self, radius_inner: float, radius_outer: float, contrast_inner: float, contrast_outer: float) -> None:
@@ -349,6 +378,19 @@ class LinearProfile(LayerProfile):
         profile[distance_mask] = intercept + slope * distance[distance_mask]
         return profile
 
+    def calculate_second_moment(self) -> float:
+        """Calculate the second moment.
+
+        Returns:
+            The calculated second moment.
+        """
+        intercept, slope = self._two_point_to_slope_intercept(
+            self.radius_inner, self.contrast_inner, self.radius_outer, self.contrast_outer
+        )
+        moment_intercept = ConstantProfile(self.radius_inner, self.radius_outer, intercept).calculate_second_moment()
+        moment_slope = 2.0 / 3.0 * np.pi * (self.radius_outer**6 - self.radius_inner**6) * slope
+        return moment_intercept + moment_slope
+
 
 class Particle:
     """
@@ -372,6 +414,9 @@ class Particle:
 
         get_profile(distance):
             Get the profile for the given distance from the origin.
+
+        calculate_square_radius_of_gyration():
+            Calculate the squared radius of the gyration.
     """
 
     def __init__(self, layers: list[LayerProfile]) -> None:
@@ -437,6 +482,17 @@ class Particle:
         for layer in self.layers:
             profile += layer.get_profile(distance)
         return profile
+
+    def calculate_square_radius_of_gyration(self) -> float:
+        """Calculate the squared radius of the gyration.
+        Returns:
+            The calculated squared radius of the gyration.
+        """
+        total_second_moment = 0.0
+        for layer in self.layers:
+            total_second_moment += layer.calculate_second_moment()
+        square_radius_of_gyration = total_second_moment / self.calculate_forward_amplitude()
+        return square_radius_of_gyration
 
 
 class ParticleBuilder:
@@ -582,6 +638,13 @@ class ScatteringModel:
         average_form_factor():
             Computes the average form factor normalized by the average forward scattering amplitude.
 
+        radius_of_gyration():
+            Calculates the radius of gyration for each particle in the model.
+
+        average_radius_of_gyration():
+            Computes the average, apparent radius of gyration of the system. The apparent radius of gyration
+            determines the inital slope of the average form factor.
+
     Usage:
         The typical usage involves creating an instance of `ScatteringModel` with wavevector, mixture,
         and a list of particles. Methods such as amplitude(), average_form_factor(), etc., can then
@@ -665,13 +728,13 @@ class ScatteringModel:
         return average_square_amplitude
 
     @cached_property
-    def average_square_forward_amplitude(self) -> NDArray[np.float64]:
+    def average_square_forward_amplitude(self) -> float:
         """The sum of the squared forward scattering amplitudes, weighted by the number fraction.
 
         Returns:
             The average squared forward scattering amplitude.
         """
-        average_square_forward_amplitude: NDArray[np.float64] = np.sum(
+        average_square_forward_amplitude: float = np.sum(
             self.mixture.number_fraction * self.forward_amplitude**2, axis=0, dtype=np.float64
         )
         return average_square_forward_amplitude
@@ -684,6 +747,38 @@ class ScatteringModel:
             The average form factor.
         """
         return self.average_square_amplitude / self.average_square_forward_amplitude
+
+    @cached_property
+    def square_radius_of_gyration(self) -> NDArray[np.float64]:
+        """
+        Calculate the radius of gyration for each particle.
+
+        Returns:
+            An array containing the radius of gyration for each particle.
+        """
+        radius_of_gyration = np.empty((len(self.particles)))
+        for i, particle in enumerate(self.particles):
+            radius_of_gyration[i] = particle.calculate_square_radius_of_gyration()
+        return radius_of_gyration
+
+    @cached_property
+    def average_square_radius_of_gyration(self) -> float:
+        """
+        Computes the average, apparent radius of gyration of the system. The apparent radius of gyration
+        determines the initial slope of the average form factor.
+
+        Returns:
+             The average radius of gyration of the system.
+        """
+        average_square_radius_of_gyration: float = (
+            np.sum(
+                self.mixture.number_fraction * self.forward_amplitude**2 * self.square_radius_of_gyration,
+                axis=0,
+                dtype=np.float64,
+            )
+            / self.average_square_forward_amplitude
+        )
+        return average_square_radius_of_gyration
 
 
 class SimpleSphere(ScatteringModel):
