@@ -40,7 +40,7 @@ Examples:
 """
 
 from functools import cached_property
-from typing import Any, Protocol
+from typing import Protocol
 
 try:
     from typing import Self
@@ -547,6 +547,7 @@ class ParticleBuilder:
 
 
 class ScatteringModel:
+    # noinspection PyShadowingNames
     """
     Calculates scattering properties for a list of particles.
 
@@ -652,25 +653,31 @@ class ScatteringModel:
         return self.amplitude**2 / self.forward_amplitude[:, np.newaxis] ** 2
 
     @cached_property
-    def average_square_amplitude(self) -> Any:
+    def average_square_amplitude(self) -> NDArray[np.float64]:
         """The sum of the squared scattering amplitudes, weighted by the number fraction.
 
         Returns:
             The average squared scattering amplitude.
         """
-        return np.sum(self.mixture.number_fraction[:, np.newaxis] * self.amplitude**2, axis=0)
+        average_square_amplitude: NDArray[np.float64] = np.sum(
+            self.mixture.number_fraction[:, np.newaxis] * self.amplitude**2, axis=0, dtype=np.float64
+        )
+        return average_square_amplitude
 
     @cached_property
-    def average_square_forward_amplitude(self) -> Any:
+    def average_square_forward_amplitude(self) -> NDArray[np.float64]:
         """The sum of the squared forward scattering amplitudes, weighted by the number fraction.
 
         Returns:
             The average squared forward scattering amplitude.
         """
-        return np.sum(self.mixture.number_fraction * self.forward_amplitude**2, axis=0)
+        average_square_forward_amplitude: NDArray[np.float64] = np.sum(
+            self.mixture.number_fraction * self.forward_amplitude**2, axis=0, dtype=np.float64
+        )
+        return average_square_forward_amplitude
 
     @cached_property
-    def average_form_factor(self) -> Any:
+    def average_form_factor(self) -> NDArray[np.float64]:
         """The average squared scattering amplitude, normalized by the average forward scattering amplitude.
 
         Returns:
@@ -680,7 +687,7 @@ class ScatteringModel:
 
 
 class SimpleSphere(ScatteringModel):
-    # noinspection PyUnresolvedReferences
+    # noinspection PyShadowingNames
     """
     A convenience class for creating a scattering model of homogeneously scattering spheres.
 
@@ -732,7 +739,7 @@ class SimpleSphere(ScatteringModel):
 
 
 class SimpleCoreShell(ScatteringModel):
-    # noinspection PyUnresolvedReferences
+    # noinspection PyShadowingNames
     """
     A convenience class for creating a scattering model of core-shell particles with a constant core-to-shell ratio.
 
@@ -801,7 +808,7 @@ class SimpleCoreShell(ScatteringModel):
 
 
 class SimpleGradient(ScatteringModel):
-    # noinspection PyUnresolvedReferences
+    # noinspection PyShadowingNames
     """
     A convenience class for creating a scattering model of particles with a linear contrast gradient.
 

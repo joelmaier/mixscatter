@@ -22,7 +22,7 @@ Functions:
 
 import numpy as np
 
-from typing import Any, Protocol
+from typing import Protocol
 
 from numpy.typing import NDArray
 
@@ -80,13 +80,13 @@ class ScatteringModelLike(Protocol):  # pragma: no cover
     def amplitude(self) -> NDArray[np.float64]: ...
 
     @property
-    def average_square_amplitude(self) -> Any: ...
+    def average_square_amplitude(self) -> NDArray[np.float64]: ...
 
     @property
-    def average_square_forward_amplitude(self) -> Any: ...
+    def average_square_forward_amplitude(self) -> NDArray[np.float64]: ...
 
     @property
-    def average_form_factor(self) -> Any: ...
+    def average_form_factor(self) -> NDArray[np.float64]: ...
 
 
 def measurable_intensity(
@@ -94,7 +94,7 @@ def measurable_intensity(
     scattering_model: ScatteringModelLike,
     scale: float = 1.0,
     background: float = 0.0,
-) -> Any:
+) -> NDArray[np.float64]:
     # noinspection PyShadowingNames
     """
     Calculate the measured intensity for a given scattering model and liquid structure.
@@ -126,17 +126,19 @@ def measurable_intensity(
         ...     liquid_structure, scattering_model, scale=1e5, background=1e3
         ... )
     """
-    average_intensity = np.einsum(
+    average_intensity: NDArray[np.float64] = np.einsum(
         "iq, jq, ijq->q",
         scattering_model.amplitude,
         scattering_model.amplitude,
         liquid_structure.number_weighted_partial_structure_factor,
     )
-    normalized_intensity = average_intensity / scattering_model.average_square_forward_amplitude
-    return scale * normalized_intensity + background
+    normalized_intensity = scale * average_intensity / scattering_model.average_square_forward_amplitude + background
+    return normalized_intensity
 
 
-def measurable_structure_factor(liquid_structure: LiquidStructureLike, scattering_model: ScatteringModelLike) -> Any:
+def measurable_structure_factor(
+    liquid_structure: LiquidStructureLike, scattering_model: ScatteringModelLike
+) -> NDArray[np.float64]:
     # noinspection PyShadowingNames
     """
     Calculate the measurable structure factor for a given scattering model and liquid structure.
@@ -170,7 +172,7 @@ def measurable_structure_factor(liquid_structure: LiquidStructureLike, scatterin
 
 def measurable_diffusion_coefficient(
     scattering_model: ScatteringModelLike, thermal_energy: float, viscosity: float
-) -> Any:
+) -> NDArray[np.float64]:
     # noinspection PyShadowingNames
     """
     Calculate the measurable Stokes-Einstein diffusion coefficient of a dilute suspension.
@@ -198,11 +200,12 @@ def measurable_diffusion_coefficient(
         ...     scattering_model, thermal_energy=1.0, viscosity=1.0
         ... )
     """
-    weighted_inverse_radius = np.sum(
+    weighted_inverse_radius: NDArray[np.float64] = np.sum(
         scattering_model.mixture.number_fraction[:, np.newaxis]
         * scattering_model.amplitude**2
         / scattering_model.mixture.radius[:, np.newaxis],
         axis=0,
+        dtype=np.float64,
     )
     weighted_inverse_radius /= scattering_model.average_square_amplitude
     prefactor = thermal_energy / (6.0 * np.pi * viscosity)

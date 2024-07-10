@@ -19,7 +19,7 @@ References:
 
 from abc import ABC, abstractmethod
 from functools import cached_property
-from typing import Any, Protocol, runtime_checkable
+from typing import Protocol, runtime_checkable
 
 import numpy as np
 from numpy.typing import ArrayLike, NDArray
@@ -102,7 +102,7 @@ class LiquidStructure(ABC):
         ...
 
     @cached_property
-    def number_weighted_partial_direct_correlation_function(self) -> Any:
+    def number_weighted_partial_direct_correlation_function(self) -> NDArray[np.float64]:
         """
         The partial direct correlation function matrix `c_ij` weighted by the square root of the
         product of the number fractions `x_i` and `x_j`.
@@ -110,7 +110,7 @@ class LiquidStructure(ABC):
         Returns:
             NDArray[np.float64]: Matrix of the weighted direct partial correlation functions.
         """
-        c_weighted_ijq = np.einsum(
+        c_weighted_ijq: NDArray[np.float64] = np.einsum(
             "i, ijq, j->ijq",
             np.sqrt(self.mixture.number_fraction),
             self.partial_direct_correlation_function,
@@ -136,7 +136,7 @@ class LiquidStructure(ABC):
         return S_ijq
 
     @cached_property
-    def number_weighted_partial_structure_factor(self) -> Any:
+    def number_weighted_partial_structure_factor(self) -> NDArray[np.float64]:
         """
         The partial direct correlation function matrix `S_ij` weighted by the square root of the
         product of the number fractions `x_i` and `x_j`.
@@ -144,7 +144,7 @@ class LiquidStructure(ABC):
         Returns:
             NDArray[np.float64]: Matrix of the weighted direct partial correlation functions.
         """
-        S_weighted_ijq = np.einsum(
+        S_weighted_ijq: NDArray[np.float64] = np.einsum(
             "i, ijq, j->ijq",
             np.sqrt(self.mixture.number_fraction),
             self.partial_structure_factor,
@@ -154,7 +154,7 @@ class LiquidStructure(ABC):
         return S_weighted_ijq
 
     @cached_property
-    def average_structure_factor(self) -> Any:
+    def average_structure_factor(self) -> NDArray[np.float64]:
         """
         The sum of the number weighted partial structure factors over all species.
 
@@ -163,10 +163,13 @@ class LiquidStructure(ABC):
         Returns:
             NDArray[np.float64]: Average structure factor.
         """
-        return np.einsum("ijq->q", self.number_weighted_partial_structure_factor)
+        average_structure_factor: NDArray[np.float64] = np.einsum(
+            "ijq->q", self.number_weighted_partial_structure_factor
+        )
+        return average_structure_factor
 
     @cached_property
-    def compressibility_structure_factor(self) -> Any:
+    def compressibility_structure_factor(self) -> NDArray[np.float64]:
         """
         The "compressibility" or "Kirkwood-Buff" structure factor.
 
@@ -179,12 +182,13 @@ class LiquidStructure(ABC):
         S_weighted_ijq = self.number_weighted_partial_structure_factor
         S_weighted_qij = np.moveaxis(S_weighted_ijq, -1, 0)
         S_weighted_inverse_qij = np.linalg.inv(S_weighted_qij)
-        return 1.0 / np.einsum(
+        compressibility_structure_factor: NDArray[np.float64] = 1.0 / np.einsum(
             "i, j, qij->q",
             self.mixture.number_fraction,
             self.mixture.number_fraction,
             S_weighted_inverse_qij,
         )
+        return compressibility_structure_factor
 
 
 class PercusYevick(LiquidStructure):
@@ -214,7 +218,7 @@ class PercusYevick(LiquidStructure):
         super().__init__(wavevector, mixture)
 
     @cached_property
-    def partial_direct_correlation_function(self) -> Any:
+    def partial_direct_correlation_function(self) -> NDArray[np.float64]:
         """
         Calculate the partial direct correlation function matrix `c_ij(q)` for the system using the
         Percus-Yevick approximation.
@@ -267,7 +271,7 @@ class PercusYevick(LiquidStructure):
         c_ijq += A_ij[:, :, np.newaxis] * (sin_iq[:, np.newaxis] * sin_iq - cos_iq[:, np.newaxis] * cos_iq)
         c_ijq *= -4.0 * np.pi * wavevector_reciprocal**2
         c_ijq *= number_density_total
-        return c_ijq
+        return np.asarray(c_ijq, dtype=np.float64)
 
 
 class VerletWeis(PercusYevick):
