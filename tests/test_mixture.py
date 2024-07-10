@@ -113,7 +113,9 @@ def test_mixture_setters_invalid_shape():
     with pytest.raises(ValueError, match="The new radius array must be of same shape as the current radius array."):
         mixture.radius = new_radius
 
-    with pytest.raises(ValueError, match="The new radius array must be of same shape as the current radius array."):
+    with pytest.raises(
+        ValueError, match="The new number fraction array must be of same shape as the current number fraction array."
+    ):
         mixture.number_fraction = new_number_fraction
 
 
