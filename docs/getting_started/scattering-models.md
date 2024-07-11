@@ -106,6 +106,8 @@ amplitude = particle.calculate_amplitude(wavevector)
 forward_amplitude = particle.calculate_forward_amplitude()
 
 form_factor = particle.calculate_form_factor(wavevector)
+
+square_radius_of_gyration = particle.calculate_square_radius_of_gyration()
 ```
 
 ### Using `ScatteringModel`

@@ -9,7 +9,7 @@ nav:
   - Getting Started:
     - Introduction: getting_started/getting-started.md
     - Mixtures: getting_started/mixtures.md
-    - Scattering models: getting_started/scattering-models.md
+    - Scattering Models: getting_started/scattering-models.md
     - Liquid Structure: getting_started/liquid-structure.md
   - API Reference:
     - mixscatter API: api/core_api.md

@@ -38,13 +38,13 @@ $$
 An important quantity is the size average of the squared amplitude
 
 $$
-\overline{F^2}(Q) = \sum_{\alpha=1}^{n} x_\alpha \, F^2_\alpha(Q).
+\langle F^2(Q) \rangle = \sum_{\alpha=1}^{n} x_\alpha \, F^2_\alpha(Q).
 $$
 
 The size-averaged form factor can then be expressed as
 
 $$
-P(Q) = \dfrac{\overline{F^2}(Q)}{\overline{F^2}(0)}.
+P(Q) = \dfrac{\langle F^2(Q) \rangle}{\langle F^2(0) \rangle}.
 $$
 
 The partial structure factors $S_{\alpha \beta}(Q)$ describe the interparticle correlations
@@ -61,6 +61,42 @@ $$
 where $\rho$ is the total number density. The partial structure factors defined here follow the 
 property $S_{\alpha\beta}(Q\to\infty) = \delta_{\alpha\beta}$.
 
+## Radius of Gyration
+
+The radius of gyration $R_\mathrm{G}$ describes the root mean square distance of the scattering 
+centers from the center of mass. For a single particle, it can be calculated from the radial
+contrast profile $\Delta\rho_\alpha(r)$ according to
+
+$$
+R_{\mathrm{G}, \alpha}^2 = \dfrac{4\pi \int\limits_{0}^{\infty} \Delta\rho_\alpha(r) \, r^4 \,\mathrm{d} r}
+{4\pi \int\limits_{0}^{\infty} \Delta\rho_\alpha(r) \, r^2 \,\mathrm{d} r}
+$$
+
+In a single component system, $R_\mathrm{G}$ is related to the initial slope of the form factor
+
+$$
+P(Q) = 1 - \dfrac{R_{\mathrm{G}}^2}{3} Q^2 + \mathcal O (Q^4),
+$$
+
+which leads to the well-known Guinier Law for small wavevectors
+
+$$
+P(Q) \approx \exp{\left(- \frac{R_{\mathrm{G}}^2}{3} Q^2 \right)}.
+$$
+
+For particle mixtures, the Guinier approximation is still valid, however, with an averaged, apparent
+radius of gyration
+
+$$
+ \langle R^2_\mathrm G \rangle = \langle F^2(0) \rangle^{-1} \sum_{\alpha=1}^{n} x_\alpha \, F^2_\alpha(0) 
+R_{\mathrm{G}, \alpha}^2,
+$$
+
+such that
+
+$$
+P(Q) \approx \exp{\left(- \frac{\langle R_{\mathrm{G}}^2 \rangle }{3} Q^2 \right)}.
+$$
 ## Effective Structure Factors
 
 There are multiple ways to define single effective, structure factors:
@@ -68,7 +104,7 @@ There are multiple ways to define single effective, structure factors:
 - The *measurable* structure factor
 
     $$
-    S_{\mathrm{M}}(Q) = \left[ \overline{F^2}(Q) \right]^{-1} \sum_{\alpha, \beta=1}^{n}
+    S_{\mathrm{M}}(Q) = \langle F^2(Q) \rangle^{-1} \sum_{\alpha, \beta=1}^{n}
         (x_\alpha x_\beta)^{1/2} \, F_\alpha(Q) \, F_\beta(Q) \, S_{\alpha \beta}(Q),
     $$
 
@@ -117,7 +153,7 @@ coefficient, which for mixtures of particles depends on the scattering amplitude
 changes with the wavevector:
 
 $$
-\overline{D_0}(Q) = \left[ \overline{F^2}(Q) \right]^{-1}
+\langle D_0(Q) \rangle = \langle F^2(Q) \rangle^{-1}
 \sum_{\alpha=1}^{n} x_\alpha \, F^2_\alpha(Q) D_{0, \alpha},
 $$
 
@@ -134,5 +170,5 @@ particles of species $\alpha$.
 An apparent hydrodynamic radius can then be defined as 
 
 $$
-R_{\mathrm{h, app}}(Q) = \dfrac{k_{\mathrm{B}} T}{6 \pi \eta_0 \overline{D_0}(Q)}.
+R_{\mathrm{h, app}}(Q) = \dfrac{k_{\mathrm{B}} T}{6 \pi \eta_0 \langle D_0(Q) \rangle}.
 $$

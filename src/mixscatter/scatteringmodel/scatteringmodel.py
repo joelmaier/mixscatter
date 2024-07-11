@@ -638,10 +638,10 @@ class ScatteringModel:
         average_form_factor():
             Computes the average form factor normalized by the average forward scattering amplitude.
 
-        radius_of_gyration():
+        square_radius_of_gyration():
             Calculates the radius of gyration for each particle in the model.
 
-        average_radius_of_gyration():
+        average_square_radius_of_gyration():
             Computes the average, apparent radius of gyration of the system. The apparent radius of gyration
             determines the inital slope of the average form factor.
 
@@ -754,12 +754,12 @@ class ScatteringModel:
         Calculate the radius of gyration for each particle.
 
         Returns:
-            An array containing the radius of gyration for each particle.
+            An array containing the square radius of gyration for each particle.
         """
-        radius_of_gyration = np.empty((len(self.particles)))
+        square_radius_of_gyration = np.empty((len(self.particles)))
         for i, particle in enumerate(self.particles):
-            radius_of_gyration[i] = particle.calculate_square_radius_of_gyration()
-        return radius_of_gyration
+            square_radius_of_gyration[i] = particle.calculate_square_radius_of_gyration()
+        return square_radius_of_gyration
 
     @cached_property
     def average_square_radius_of_gyration(self) -> float:
