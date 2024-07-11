@@ -68,24 +68,13 @@ jobs:
       with:
         name: python-package-distributions
         path: dist/
-    - name: Check if GitHub release already exists
-      id: check_release
-      env:
-        GITHUB_TOKEN: ${{ github.token }}
-      run: |
-        if gh release view "${{ github.ref_name }}" --repo "${{ github.repository }}" > /dev/null 2>&1; then
-          echo "exists=true" >> $GITHUB_ENV
-        else
-          echo "exists=false" >> $GITHUB_ENV
     - name: Sign the dists with Sigstore
-      if: env.exists == 'false'
       uses: sigstore/gh-action-sigstore-python@v2.1.1
       with:
         inputs: >-
           ./dist/*.tar.gz
           ./dist/*.whl
     - name: Create GitHub Release
-      if: env.exists == 'false'
       env:
         GITHUB_TOKEN: ${{ github.token }}
       run: >-
@@ -94,7 +83,6 @@ jobs:
         --repo '${{ github.repository }}'
         --notes ""
     - name: Upload artifact signatures to GitHub Release
-      if: env.exists == 'false'
       env:
         GITHUB_TOKEN: ${{ github.token }}
       # Upload to GitHub Release using the `gh` CLI.
