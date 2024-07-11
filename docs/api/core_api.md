@@ -1,1 +1,1 @@
-::: mixscatter
+::: mixscatter.core

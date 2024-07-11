@@ -91,7 +91,9 @@ class Mixture:
         """
         new_array: NDArray[np.float64] = np.asarray(number_fraction_array, dtype=np.float64)
         if self._number_fraction.shape != new_array.shape:
-            raise ValueError("The new radius array must be of same shape as the current radius array.")
+            raise ValueError(
+                "The new number fraction array must be of same shape as the current number fraction array."
+            )
         self._number_fraction = new_array
 
     @property

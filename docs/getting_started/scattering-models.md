@@ -96,7 +96,7 @@ particle = (
 The [`Particle`](
 ../api/scatteringmodel_api.md#mixscatter.scatteringmodel.Particle) class provides methods for
 displaying the scattering length density profile and for calculating the scattering amplitude and 
-the formfactor of a single constructed particle:
+the form factor of a single constructed particle:
 
 ```python
 profile = particle.get_profile(distance)
@@ -106,6 +106,8 @@ amplitude = particle.calculate_amplitude(wavevector)
 forward_amplitude = particle.calculate_forward_amplitude()
 
 form_factor = particle.calculate_form_factor(wavevector)
+
+square_radius_of_gyration = particle.calculate_square_radius_of_gyration()
 ```
 
 ### Using `ScatteringModel`

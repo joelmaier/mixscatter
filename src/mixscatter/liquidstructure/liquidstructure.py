@@ -1,5 +1,5 @@
 """
-Module `liquidstructure` provides classes for representing the liquid structure properties of
+This module provides classes for representing the liquid structure properties of
 interacting multicomponent systems of spherical particles.
 
 Classes:
@@ -19,13 +19,19 @@ References:
 
 from abc import ABC, abstractmethod
 from functools import cached_property
-from typing import Any, Protocol
+from typing import Protocol, runtime_checkable
 
 import numpy as np
 from numpy.typing import ArrayLike, NDArray
 
 
+@runtime_checkable
+class HasMutableRadius(Protocol):
+    radius: NDArray[np.float64]
+
+
 # noinspection PyPropertyDefinition
+@runtime_checkable
 class MixtureLike(Protocol):  # pragma: no cover
     """
     A protocol defining the interface for mixture-like objects.
@@ -44,9 +50,6 @@ class MixtureLike(Protocol):  # pragma: no cover
 
     @property
     def radius(self) -> NDArray[np.float64]: ...
-
-    @radius.setter
-    def radius(self, radius_array: ArrayLike) -> Any: ...
 
     @property
     def number_of_components(self) -> int: ...
@@ -99,7 +102,7 @@ class LiquidStructure(ABC):
         ...
 
     @cached_property
-    def number_weighted_partial_direct_correlation_function(self) -> Any:
+    def number_weighted_partial_direct_correlation_function(self) -> NDArray[np.float64]:
         """
         The partial direct correlation function matrix `c_ij` weighted by the square root of the
         product of the number fractions `x_i` and `x_j`.
@@ -107,7 +110,7 @@ class LiquidStructure(ABC):
         Returns:
             NDArray[np.float64]: Matrix of the weighted direct partial correlation functions.
         """
-        c_weighted_ijq = np.einsum(
+        c_weighted_ijq: NDArray[np.float64] = np.einsum(
             "i, ijq, j->ijq",
             np.sqrt(self.mixture.number_fraction),
             self.partial_direct_correlation_function,
@@ -133,7 +136,7 @@ class LiquidStructure(ABC):
         return S_ijq
 
     @cached_property
-    def number_weighted_partial_structure_factor(self) -> Any:
+    def number_weighted_partial_structure_factor(self) -> NDArray[np.float64]:
         """
         The partial direct correlation function matrix `S_ij` weighted by the square root of the
         product of the number fractions `x_i` and `x_j`.
@@ -141,7 +144,7 @@ class LiquidStructure(ABC):
         Returns:
             NDArray[np.float64]: Matrix of the weighted direct partial correlation functions.
         """
-        S_weighted_ijq = np.einsum(
+        S_weighted_ijq: NDArray[np.float64] = np.einsum(
             "i, ijq, j->ijq",
             np.sqrt(self.mixture.number_fraction),
             self.partial_structure_factor,
@@ -151,7 +154,7 @@ class LiquidStructure(ABC):
         return S_weighted_ijq
 
     @cached_property
-    def average_structure_factor(self) -> Any:
+    def average_structure_factor(self) -> NDArray[np.float64]:
         """
         The sum of the number weighted partial structure factors over all species.
 
@@ -160,10 +163,13 @@ class LiquidStructure(ABC):
         Returns:
             NDArray[np.float64]: Average structure factor.
         """
-        return np.einsum("ijq->q", self.number_weighted_partial_structure_factor)
+        average_structure_factor: NDArray[np.float64] = np.einsum(
+            "ijq->q", self.number_weighted_partial_structure_factor
+        )
+        return average_structure_factor
 
     @cached_property
-    def compressibility_structure_factor(self) -> Any:
+    def compressibility_structure_factor(self) -> NDArray[np.float64]:
         """
         The "compressibility" or "Kirkwood-Buff" structure factor.
 
@@ -176,12 +182,13 @@ class LiquidStructure(ABC):
         S_weighted_ijq = self.number_weighted_partial_structure_factor
         S_weighted_qij = np.moveaxis(S_weighted_ijq, -1, 0)
         S_weighted_inverse_qij = np.linalg.inv(S_weighted_qij)
-        return 1.0 / np.einsum(
+        compressibility_structure_factor: NDArray[np.float64] = 1.0 / np.einsum(
             "i, j, qij->q",
             self.mixture.number_fraction,
             self.mixture.number_fraction,
             S_weighted_inverse_qij,
         )
+        return compressibility_structure_factor
 
 
 class PercusYevick(LiquidStructure):
@@ -211,7 +218,7 @@ class PercusYevick(LiquidStructure):
         super().__init__(wavevector, mixture)
 
     @cached_property
-    def partial_direct_correlation_function(self) -> Any:
+    def partial_direct_correlation_function(self) -> NDArray[np.float64]:
         """
         Calculate the partial direct correlation function matrix `c_ij(q)` for the system using the
         Percus-Yevick approximation.
@@ -264,7 +271,7 @@ class PercusYevick(LiquidStructure):
         c_ijq += A_ij[:, :, np.newaxis] * (sin_iq[:, np.newaxis] * sin_iq - cos_iq[:, np.newaxis] * cos_iq)
         c_ijq *= -4.0 * np.pi * wavevector_reciprocal**2
         c_ijq *= number_density_total
-        return c_ijq
+        return np.asarray(c_ijq, dtype=np.float64)
 
 
 class VerletWeis(PercusYevick):
@@ -289,5 +296,17 @@ class VerletWeis(PercusYevick):
         """
         effective_volume_fraction = volume_fraction_total * (1.0 - volume_fraction_total / 16.0)
         effective_radius = mixture.radius * (effective_volume_fraction / volume_fraction_total) ** (1.0 / 3.0)
-        mixture.radius = effective_radius
+
+        # Some static type checkers at the moment cannot handle protocols implementing property setters
+        # and since a mutable radius property is only needed here, a manual isinstance assertion is performed
+        # try:
+        #     mixture.radius = effective_radius
+        # except
+
+        if isinstance(mixture, HasMutableRadius) and getattr(type(mixture), "radius").fset is not None:
+            mixture.radius = effective_radius
+            assert isinstance(mixture, MixtureLike)
+        else:
+            raise AttributeError("`radius` property of `mixture` must be mutable.")
+
         super().__init__(wavevector, mixture, volume_fraction_total=effective_volume_fraction)

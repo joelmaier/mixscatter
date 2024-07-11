@@ -1,15 +1,14 @@
 # mixscatter
 
-![Python Badge](https://img.shields.io/badge/Python-3776AB?logo=python&logoColor=fff&style=for-the-badge)
-![Pytest Badge](https://img.shields.io/badge/Pytest-0A9EDC?logo=pytest&logoColor=fff&style=for-the-badge)
-![Ruff Badge](https://img.shields.io/badge/Ruff-D7FF64?logo=ruff&logoColor=000&style=for-the-badge)
-
+[![Python](https://img.shields.io/pypi/pyversions/mixscatter.svg)](https://badge.fury.io/py/mixscatter)
+[![PyPI](https://badge.fury.io/py/mixscatter.svg)](https://badge.fury.io/py/mixscatter)
+[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT)
 [![Test](https://github.com/joelmaier/mixscatter/actions/workflows/test.yml/badge.svg)](https://github.com/joelmaier/mixscatter/actions/workflows/test.yml)
 [![Lint](https://github.com/joelmaier/mixscatter/actions/workflows/lint.yml/badge.svg)](https://github.com/joelmaier/mixscatter/actions/workflows/lint.yml)
 [![Type Check](https://github.com/joelmaier/mixscatter/actions/workflows/type_check.yml/badge.svg)](https://github.com/joelmaier/mixscatter/actions/workflows/type_check.yml)
 [![Docs](https://github.com/joelmaier/mixscatter/actions/workflows/docs.yml/badge.svg)](https://github.com/joelmaier/mixscatter/actions/workflows/docs.yml)
 [![Nox](https://img.shields.io/badge/%F0%9F%A6%8A-Nox-D85E00.svg)](https://github.com/wntrblm/nox)
-[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT)
+
 
 ## Table of Contents
 * [Overview](#overview)
@@ -69,7 +68,7 @@ Find the documentation on GitHub Pages: https://joelmaier.github.io/mixscatter/
 This example demonstrates the fundamental capabilities of **mixscatter**. For a comprehensive 
 walk-through, refer to the
 [Getting Started Guide](
-https://joelmaier.github.io/mixscatter/getting_started/getting-started.html). 
+https://joelmaier.github.io/mixscatter/getting_started/getting-started). 
 
 Run this code to
 produce the figure below.

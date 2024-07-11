@@ -69,12 +69,12 @@ the wavevector $Q$, for example, from a computer simulation. You can easily use 
 factors in **mixscatter**.
 
 To be used in the functions [`measurable_intensity`](
-../api/core_api.md#mixscatter.measurable_intensity) and
+../api/core_api.md#mixscatter.core.measurable_intensity) and
 [`measurable_structure_factor`](
-../api/core_api.md#mixscatter.measurable_structure_factor),
+../api/core_api.md#mixscatter.core.measurable_structure_factor),
 you have to provide an object with an interface which follows the 
 [`LiquidStructureLike`](
-../api/core_api.md#mixscatter.LiquidStructureLike)
+../api/core_api.md#mixscatter.core.LiquidStructureLike)
 protocol.
 ```python
 class LiquidStructureLike(Protocol):

@@ -1,19 +1,19 @@
 # type: ignore
 import pytest
+from unittest.mock import create_autospec
 import numpy as np
 from numpy.testing import assert_array_almost_equal
 
-from mixscatter.liquidstructure import LiquidStructure, PercusYevick, VerletWeis
+from mixscatter.liquidstructure.liquidstructure import LiquidStructure, PercusYevick, VerletWeis, MixtureLike
 
 
 @pytest.fixture
 def mock_mixture(mocker):
-    mock_mixture = mocker.Mock()
+    mock_mixture = create_autospec(MixtureLike, instance=True)
     mock_mixture.number_fraction = np.array([0.5, 0.5])
     mock_mixture.radius = np.array([1.0, 2.0])
     mock_mixture.number_of_components = 2
     mock_mixture.moment.side_effect = lambda order: np.sum(mock_mixture.number_fraction * mock_mixture.radius**order)
-
     return mock_mixture
 
 
@@ -99,13 +99,42 @@ def test_percus_yevick_compressibility_structure_factor(mock_mixture):
 
 
 def test_percus_yevick_verlet_weiss_initialization(mock_mixture):
+    class MutableMixture(MixtureLike):
+        def __init__(self, radius):
+            self._radius = np.array(radius)
+
+        @property
+        def radius(self):
+            return self._radius
+
+        @radius.setter
+        def radius(self, radius):
+            self._radius = np.array(radius)
+
+    mixture = MutableMixture(radius=np.array([1.0, 2.0]))
     wavevector = [0.1, 0.2, 0.3]
     volume_fraction_total = 0.3
-    pyvw = VerletWeis(wavevector, mock_mixture, volume_fraction_total)
+    pyvw = VerletWeis(wavevector, mixture, volume_fraction_total)
     assert np.allclose(pyvw.wavevector, [0.1, 0.2, 0.3])
-    assert pyvw.mixture == mock_mixture
+    assert pyvw.mixture == mixture
     assert pyvw.volume_fraction_total == pytest.approx(volume_fraction_total * (1 - volume_fraction_total / 16))
     assert_array_almost_equal(pyvw.mixture.radius, np.array([0.994, 1.987]), decimal=3)
+
+
+def test_verlet_weis_without_mutable_radius():
+    class ImmutableMixture(MixtureLike):
+        def __init__(self, radius):
+            self._radius = np.array(radius)
+
+        @property
+        def radius(self):
+            return self._radius
+
+    wavevector = [0.1, 0.2, 0.3]
+    mixture = ImmutableMixture(radius=np.array([0.1, 0.2, 0.3]))
+    # Should raise a TypeError
+    with pytest.raises(AttributeError, match="`radius` property of `mixture` must be mutable."):
+        VerletWeis(wavevector, mixture, 0.5)
 
 
 if __name__ == "__main__":

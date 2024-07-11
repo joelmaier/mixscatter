@@ -22,7 +22,7 @@ Functions:
 Examples:
     Create a simple scattering model for spheres:
 
-    >>> from mixscatter.mixture import Mixture
+    >>> from mixscatter import Mixture
     >>> wavevector = np.linspace(0.01, 1.0, 100)
     >>> mixture = Mixture(number_fraction=[0.5, 0.5], radius=[1.0, 2.0])
     >>> model = SimpleSphere(wavevector, mixture, contrast=1.0)
@@ -40,7 +40,7 @@ Examples:
 """
 
 from functools import cached_property
-from typing import Any, Protocol
+from typing import Protocol
 
 try:
     from typing import Self
@@ -78,11 +78,47 @@ class LayerProfile(Protocol):  # pragma: no cover
         """Get the profile for the given distance from the origin."""
         ...
 
+    def calculate_second_moment(self) -> float:
+        """Calculate the second moment."""
+        ...
+
 
 class EmptyProfile(LayerProfile):
-    """Represents an empty layer profile."""
+    """
+    Represents an empty layer profile.
+
+    Attributes:
+        radius_inner (float): Inner radius of the empty layer.
+        radius_outer (float): Outer radius of the empty layer.
+
+    Methods:
+        __init__(radius_inner, radius_outer):
+            Initialize an empty layer profile.
+
+        calculate_amplitude(wavevector):
+            Calculate the amplitude for the given wavevector.
+
+        calculate_forward_amplitude():
+            Calculate the forward amplitude.
+
+        get_profile(distance):
+            Get the profile for the given distance from the origin.
+
+        calculate_second_moment():
+            Calculate the second moment.
+    """
 
     def __init__(self, radius_inner: float, radius_outer: float) -> None:
+        """
+        Initialize an empty layer profile.
+
+        Args:
+            radius_inner: Inner radius of the empty layer.
+            radius_outer: Outer radius of the empty layer.
+
+        Raises:
+            RuntimeError: If `radius_inner` is greater than `radius_outer`.
+        """
         if radius_inner > radius_outer:
             raise RuntimeError("'radius_inner' must be smaller than 'radius_outer'.")
 
@@ -90,10 +126,14 @@ class EmptyProfile(LayerProfile):
         self.radius_outer = radius_outer
 
     def calculate_amplitude(self, wavevector: ArrayLike) -> NDArray[np.float64]:
-        """Calculate the amplitude for the given wavevector.
+        """
+        Calculate the amplitude for the given wavevector.
+
+        Args:
+            wavevector: Scattering wavevector.
 
         Returns:
-            A zero array of the same shape as the wavevector.
+            Zero array of the same shape as wavevector.
         """
         wavevector = np.asarray(wavevector, dtype=np.float64)
         return np.zeros_like(wavevector)
@@ -107,19 +147,65 @@ class EmptyProfile(LayerProfile):
         return 0.0
 
     def get_profile(self, distance: ArrayLike) -> NDArray[np.float64]:
-        """Get the profile for the given distance from the origin.
+        """
+        Get the profile for the given distance from the origin.
+
+        Args:
+            distance: Distance from the origin.
 
         Returns:
-            A zero array of the same shape as the distance.
+            Zero array of the same shape as distance.
         """
         distance = np.asarray(distance, dtype=np.float64)
         return np.zeros_like(distance)
 
+    def calculate_second_moment(self) -> float:
+        """Calculate the second moment.
+
+        Returns:
+            Zero.
+        """
+        return 0.0
+
 
 class ConstantProfile(LayerProfile):
-    """Represents a layer profile with constant contrast."""
+    """
+    Represents a layer profile with constant contrast.
+
+    Attributes:
+        radius_inner (float): Inner radius of the layer.
+        radius_outer (float): Outer radius of the layer.
+        contrast (float): Scattering contrast of the layer.
+
+    Methods:
+        __init__(radius_inner, radius_outer, contrast):
+            Initialize a constant layer profile.
+
+        calculate_amplitude(wavevector):
+            Calculate the amplitude for the given wavevector.
+
+        calculate_forward_amplitude():
+            Calculate the forward amplitude.
+
+        get_profile(distance):
+            Get the profile for the given distance from the origin.
+
+        calculate_second_moment():
+            Calculate the second moment.
+    """
 
     def __init__(self, radius_inner: float, radius_outer: float, contrast: float) -> None:
+        """
+        Initialize a constant layer profile.
+
+        Args:
+            radius_inner: Inner radius of the layer.
+            radius_outer: Outer radius of the layer.
+            contrast: Scattering contrast of the layer.
+
+        Raises:
+            RuntimeError: If `radius_inner` is greater than `radius_outer`.
+        """
         if radius_inner > radius_outer:
             raise RuntimeError("'radius_inner' must be smaller than 'radius_outer'.")
 
@@ -128,10 +214,14 @@ class ConstantProfile(LayerProfile):
         self.contrast = contrast
 
     def calculate_amplitude(self, wavevector: ArrayLike) -> NDArray[np.float64]:
-        """Calculate the amplitude for the given wavevector.
+        """
+        Calculate the amplitude for the given wavevector.
+
+        Args:
+            wavevector: Scattering wavevector.
 
         Returns:
-            The calculated amplitude array.
+            Calculated amplitude array.
         """
         wavevector = np.asarray(wavevector, dtype=np.float64)
         QR_outer = wavevector * self.radius_outer
@@ -152,6 +242,9 @@ class ConstantProfile(LayerProfile):
     def get_profile(self, distance: ArrayLike) -> NDArray[np.float64]:
         """Get the profile for the given distance from the origin.
 
+        Args:
+            distance: Distance from the origin.
+
         Returns:
             The profile evaluated on the distance array.
         """
@@ -159,11 +252,55 @@ class ConstantProfile(LayerProfile):
         distance_mask = (distance >= self.radius_inner) & (distance < self.radius_outer)
         return np.where(distance_mask, self.contrast, 0.0)
 
+    def calculate_second_moment(self) -> float:
+        """Calculate the second moment.
+
+        Returns:
+            The calculated second moment.
+        """
+        return 4.0 / 5.0 * np.pi * (self.radius_outer**5 - self.radius_inner**5) * self.contrast
+
 
 class LinearProfile(LayerProfile):
-    """Represents a layer profile with linearly varying contrast."""
+    """
+    Represents a layer profile with linearly varying contrast.
+
+    Attributes:
+        radius_inner (float): Inner radius of the layer.
+        radius_outer (float): Outer radius of the layer.
+        contrast_inner (float): Contrast at the inner radius.
+        contrast_outer (float): Contrast at the outer radius.
+
+    Methods:
+        __init__(radius_inner, radius_outer, contrast_inner, contrast_outer):
+            Initialize a linearly varying layer profile.
+
+        calculate_amplitude(wavevector):
+            Calculate the amplitude for the given wavevector.
+
+        calculate_forward_amplitude():
+            Calculate the forward amplitude.
+
+        get_profile(distance):
+            Get the profile for the given distance from the origin.
+
+        calculate_second_moment():
+            Calculate the second moment.
+    """
 
     def __init__(self, radius_inner: float, radius_outer: float, contrast_inner: float, contrast_outer: float) -> None:
+        """
+        Initialize a linearly varying layer profile.
+
+        Args:
+            radius_inner (float): Inner radius of the layer.
+            radius_outer (float): Outer radius of the layer.
+            contrast_inner (float): Contrast at the inner radius.
+            contrast_outer (float): Contrast at the outer radius.
+
+        Raises:
+            RuntimeError: If radius_inner is greater than radius_outer.
+        """
         if radius_inner > radius_outer:
             raise RuntimeError("'radius_inner' must be smaller than 'radius_outer'.")
 
@@ -174,6 +311,9 @@ class LinearProfile(LayerProfile):
 
     def calculate_amplitude(self, wavevector: ArrayLike) -> NDArray[np.float64]:
         """Calculate the amplitude for the given wavevector.
+
+        Args:
+            wavevector: Scattering wavevector.
 
         Returns:
             The calculated amplitude array.
@@ -223,6 +363,9 @@ class LinearProfile(LayerProfile):
     def get_profile(self, distance: ArrayLike) -> NDArray[np.float64]:
         """Get the profile for the given distance from the origin.
 
+        Args:
+            distance: Distance from the origin.
+
         Returns:
             The profile evaluated on the distance array.
         """
@@ -235,15 +378,61 @@ class LinearProfile(LayerProfile):
         profile[distance_mask] = intercept + slope * distance[distance_mask]
         return profile
 
+    def calculate_second_moment(self) -> float:
+        """Calculate the second moment.
+
+        Returns:
+            The calculated second moment.
+        """
+        intercept, slope = self._two_point_to_slope_intercept(
+            self.radius_inner, self.contrast_inner, self.radius_outer, self.contrast_outer
+        )
+        moment_intercept = ConstantProfile(self.radius_inner, self.radius_outer, intercept).calculate_second_moment()
+        moment_slope = 2.0 / 3.0 * np.pi * (self.radius_outer**6 - self.radius_inner**6) * slope
+        return moment_intercept + moment_slope
+
 
 class Particle:
-    """Represents a particle composed of multiple layers."""
+    """
+    Represents a particle composed of multiple layers.
+
+    Attributes:
+        layers (list): List of `LayerProfile` instances representing particle layers.
+
+    Methods:
+        __init__(layers):
+            Initialize a particle with given layers.
+
+        calculate_amplitude(wavevector):
+            Calculate the amplitude for the given wavevector.
+
+        calculate_forward_amplitude():
+            Calculate the forward amplitude.
+
+        calculate_form_factor(wavevector):
+            Calculate the form factor for the given wavevector.
+
+        get_profile(distance):
+            Get the profile for the given distance from the origin.
+
+        calculate_square_radius_of_gyration():
+            Calculate the squared radius of the gyration.
+    """
 
     def __init__(self, layers: list[LayerProfile]) -> None:
+        """
+        Initialize a particle with given layers.
+
+        Args:
+            layers: List of `LayerProfile` instances representing particle layers.
+        """
         self.layers = layers
 
     def calculate_amplitude(self, wavevector: ArrayLike) -> NDArray[np.float64]:
         """Calculate the amplitude for the given wavevector.
+
+        Args:
+            wavevector: Scattering wavevector.
 
         Returns:
             The calculated amplitude array.
@@ -268,16 +457,22 @@ class Particle:
     def calculate_form_factor(self, wavevector: ArrayLike) -> NDArray[np.float64]:
         """Calculate the form factor for the given wavevector.
 
+        Args:
+            wavevector: Scattering wavevector.
+
         Returns:
             The calculated form factor array.
         """
         wavevector = np.asarray(wavevector, dtype=np.float64)
         amplitude = self.calculate_amplitude(wavevector)
         forward_amplitude = self.calculate_forward_amplitude()
-        return (amplitude / forward_amplitude) ** 2
+        return (amplitude / forward_amplitude) ** 2.0
 
     def get_profile(self, distance: ArrayLike) -> NDArray[np.float64]:
         """Get the profile for the given distance from the origin.
+
+        Args:
+            distance: Distance from the origin.
 
         Returns:
             The profile evaluated on the distance array.
@@ -288,18 +483,82 @@ class Particle:
             profile += layer.get_profile(distance)
         return profile
 
+    def calculate_square_radius_of_gyration(self) -> float:
+        """Calculate the squared radius of the gyration.
+        Returns:
+            The calculated squared radius of the gyration.
+        """
+        total_second_moment = 0.0
+        for layer in self.layers:
+            total_second_moment += layer.calculate_second_moment()
+        square_radius_of_gyration = total_second_moment / self.calculate_forward_amplitude()
+        return square_radius_of_gyration
+
 
 class ParticleBuilder:
-    """A builder class for constructing Particle instances."""
+    """
+    A builder class for constructing `Particle` instances.
+
+    This class facilitates the step-by-step construction of `Particle` objects composed of multiple
+    layers, where each layer is represented by a `LayerProfile` instance. The builder ensures that layers
+    are added sequentially, with checks for connectivity between layers and overlap prevention.
+
+    Attributes:
+        layers (list): List to store `LayerProfile` instances representing the layers of the particle.
+
+    Methods:
+        __init__():
+            Initializes an empty `ParticleBuilder` instance.
+
+        add_layer(layer):
+            Adds a layer to the particle being built. Ensures the new layer connects correctly to the
+            previous layer and does not overlap with existing layers.
+
+        reset():
+            Resets the builder instance, clearing all layers stored in the layers list.
+
+        get_particle():
+            Constructs and returns a `Particle` instance using the layers added so far.
+
+        pop_particle():
+            Constructs and returns a `Particle` instance using the layers added so far, then resets the
+            builder instance to start building a new particle.
+
+    Usage:
+        The typical usage involves creating a `ParticleBuilder` instance, adding layers using add_layer(),
+        and finally retrieving the constructed particle using get_particle() or pop_particle().
+
+    Example:
+        Construct a particle using `ParticleBuilder`:
+
+            >>> from mixscatter.scatteringmodel import ParticleBuilder, ConstantProfile
+            >>> layer1 = ConstantProfile(radius_inner=0.0, radius_outer=2.0, contrast=1.0)
+            >>> layer2 = ConstantProfile(radius_inner=2.0, radius_outer=5.0, contrast=0.5)
+            >>> builder = ParticleBuilder()
+            >>> particle = builder.add_layer(layer1).add_layer(layer2).get_particle()
+
+    Notes:
+        - The add_layer() method ensures that each added layer starts where the previous layer ends,
+          preventing gaps or overlaps between layers.
+        - The reset() method allows reusing the same builder instance to construct multiple particles.
+        - The pop_particle() method is useful when constructing and retrieving particles in a single step,
+          resetting the builder for the next particle construction.
+
+    Raises:
+        RuntimeError:
+            Raised by add_layer() method if the added layer does not connect correctly to the
+            previous layer or if there is an overlap with existing layers.
+    """
 
     def __init__(self) -> None:
+        """Initializes an empty `ParticleBuilder` instance."""
         self.layers: list[LayerProfile] = []
 
     def add_layer(self, layer: LayerProfile) -> Self:
         """Add a layer to the particle being built.
 
         Args:
-            layer: LayerProfile instance to be added.
+            layer: `LayerProfile` instance to be added.
 
         Returns:
             The builder instance.
@@ -318,22 +577,25 @@ class ParticleBuilder:
         return self
 
     def reset(self) -> None:
-        """Reset the builder, clearing all layers."""
+        """Resets the builder instance, clearing all layers stored in the layers list."""
         self.layers = []
 
     def get_particle(self) -> Particle:
-        """Get the constructed particle.
+        """
+        Constructs and returns a `Particle` instance using the layers added so far.
 
         Returns:
-            The constructed Particle instance.
+            The constructed `Particle` instance.
         """
         return Particle(self.layers)
 
     def pop_particle(self) -> Particle:
-        """Get the constructed particle and reset the builder.
+        """
+        Constructs and returns a `Particle` instance using the layers added so far,
+        then resets the builder instance to start building a new particle.
 
         Returns:
-            The constructed Particle instance.
+            Particle: The constructed `Particle` instance.
         """
         particle = Particle(self.layers)
         self.reset()
@@ -341,19 +603,89 @@ class ParticleBuilder:
 
 
 class ScatteringModel:
-    """Calculates scattering properties for a list of particles."""
+    # noinspection PyShadowingNames
+    """
+    Calculates scattering properties for a list of particles.
+
+    This class computes various scattering properties, including amplitudes, form factors,
+    and averages over multiple particles. It handles both single-particle and multi-particle
+    scattering scenarios.
+
+    Attributes:
+        wavevector (NDArray[np.float64]): Array of wavevector values at which scattering properties are computed.
+        mixture (MixtureLike): `Mixture` object containing number fractions and radii of particle components.
+        particles (list): List of `Particle` instances representing the particles in the scattering model.
+
+    Methods:
+        __init__(wavevector, mixture, particles):
+            Initializes a `ScatteringModel` instance with given wavevector, mixture, and particles.
+
+        amplitude():
+            Calculates the scattering amplitude for each particle in the model.
+
+        forward_amplitude():
+            Calculates the forward scattering amplitude for each particle in the model.
+
+        single_form_factor():
+            Computes the normalized form factors of the single species particles.
+
+        average_square_amplitude():
+            Computes the sum of squared scattering amplitudes weighted by number fractions.
+
+        average_square_forward_amplitude():
+            Computes the sum of squared forward scattering amplitudes weighted by number fractions.
+
+        average_form_factor():
+            Computes the average form factor normalized by the average forward scattering amplitude.
+
+        square_radius_of_gyration():
+            Calculates the radius of gyration for each particle in the model.
+
+        average_square_radius_of_gyration():
+            Computes the average, apparent radius of gyration of the system. The apparent radius of gyration
+            determines the inital slope of the average form factor.
+
+    Usage:
+        The typical usage involves creating an instance of `ScatteringModel` with wavevector, mixture,
+        and a list of particles. Methods such as amplitude(), average_form_factor(), etc., can then
+        be called to compute specific scattering properties.
+
+    Example:
+        Create a `ScatteringModel` instance from a list of particles:
+
+            >>> import numpy as np
+            >>> from mixscatter import Mixture, Particle, ScatteringModel
+            >>> wavevector = np.linspace(0.01, 1.0, 100)
+            >>> mixture = Mixture(number_fraction=[0.5, 0.5], radius=[1.0, 2.0])
+            >>> particle1 = Particle([ConstantProfile(0, 1.0, 1.0)])
+            >>> particle2 = Particle([ConstantProfile(0, 2.0, 0.5)])
+            >>> model = ScatteringModel(wavevector, mixture, [particle1, particle2])
+            >>> form_factor = model.average_form_factor
+
+    Notes:
+        - Scattering calculations are cached for efficiency.
+    """
 
     def __init__(self, wavevector: ArrayLike, mixture: MixtureLike, particles: list[Particle]):
+        """
+        Initializes a `ScatteringModel` instance.
+
+        Args:
+            wavevector: Array of wavevector values at which scattering properties are computed.
+            mixture: Mixture object containing number fractions and radii of particle components.
+            particles: List of `Particle` instances representing the particles in the scattering model.
+        """
         self.wavevector = np.asarray(wavevector, dtype=np.float64)
         self.mixture = mixture
         self.particles = particles
 
     @cached_property
     def amplitude(self) -> NDArray[np.float64]:
-        """Calculate the amplitude for each particle.
+        """
+        Calculates the scattering amplitude for each particle.
 
         Returns:
-            An array of amplitudes for each particle.
+            Array of amplitudes for each particle at each wavevector point.
         """
         amplitude = np.empty((len(self.particles), len(self.wavevector)))
         for i, particle in enumerate(self.particles):
@@ -362,7 +694,8 @@ class ScatteringModel:
 
     @cached_property
     def forward_amplitude(self) -> NDArray[np.float64]:
-        """Calculate the forward amplitude for each particle.
+        """
+        Calculate the forward amplitude for each particle.
 
         Returns:
             An array of forward amplitudes for each particle.
@@ -374,33 +707,40 @@ class ScatteringModel:
 
     @cached_property
     def single_form_factor(self) -> NDArray[np.float64]:
-        """The normalized form factors of the single species.
+        """
+        Computes the normalized form factors of the single species particles.
 
         Returns:
-            The form factors.
+            Form factors of the single species particles.
         """
         return self.amplitude**2 / self.forward_amplitude[:, np.newaxis] ** 2
 
     @cached_property
-    def average_square_amplitude(self) -> Any:
+    def average_square_amplitude(self) -> NDArray[np.float64]:
         """The sum of the squared scattering amplitudes, weighted by the number fraction.
 
         Returns:
             The average squared scattering amplitude.
         """
-        return np.sum(self.mixture.number_fraction[:, np.newaxis] * self.amplitude**2, axis=0)
+        average_square_amplitude: NDArray[np.float64] = np.sum(
+            self.mixture.number_fraction[:, np.newaxis] * self.amplitude**2, axis=0, dtype=np.float64
+        )
+        return average_square_amplitude
 
     @cached_property
-    def average_square_forward_amplitude(self) -> Any:
+    def average_square_forward_amplitude(self) -> float:
         """The sum of the squared forward scattering amplitudes, weighted by the number fraction.
 
         Returns:
             The average squared forward scattering amplitude.
         """
-        return np.sum(self.mixture.number_fraction * self.forward_amplitude**2, axis=0)
+        average_square_forward_amplitude: float = np.sum(
+            self.mixture.number_fraction * self.forward_amplitude**2, axis=0, dtype=np.float64
+        )
+        return average_square_forward_amplitude
 
     @cached_property
-    def average_form_factor(self) -> Any:
+    def average_form_factor(self) -> NDArray[np.float64]:
         """The average squared scattering amplitude, normalized by the average forward scattering amplitude.
 
         Returns:
@@ -408,11 +748,83 @@ class ScatteringModel:
         """
         return self.average_square_amplitude / self.average_square_forward_amplitude
 
+    @cached_property
+    def square_radius_of_gyration(self) -> NDArray[np.float64]:
+        """
+        Calculate the radius of gyration for each particle.
+
+        Returns:
+            An array containing the square radius of gyration for each particle.
+        """
+        square_radius_of_gyration = np.empty((len(self.particles)))
+        for i, particle in enumerate(self.particles):
+            square_radius_of_gyration[i] = particle.calculate_square_radius_of_gyration()
+        return square_radius_of_gyration
+
+    @cached_property
+    def average_square_radius_of_gyration(self) -> float:
+        """
+        Computes the average, apparent radius of gyration of the system. The apparent radius of gyration
+        determines the initial slope of the average form factor.
+
+        Returns:
+             The average radius of gyration of the system.
+        """
+        average_square_radius_of_gyration: float = (
+            np.sum(
+                self.mixture.number_fraction * self.forward_amplitude**2 * self.square_radius_of_gyration,
+                axis=0,
+                dtype=np.float64,
+            )
+            / self.average_square_forward_amplitude
+        )
+        return average_square_radius_of_gyration
+
 
 class SimpleSphere(ScatteringModel):
-    """A convenience class for creating a scattering model of homogeneously scattering spheres."""
+    # noinspection PyShadowingNames
+    """
+    A convenience class for creating a scattering model of homogeneously scattering spheres.
+
+    This class simplifies the creation of a scattering model where particles are represented
+    by homogeneously scattering spheres with a common, constant contrast.
+
+    Attributes:
+        wavevector (NDArray[np.float64]): Array of wavevector values at which scattering properties are computed.
+        mixture (MixtureLike): `Mixture` object containing number fractions and radii of particle components.
+        particles (list): List of `Particle` instances representing the particles in the scattering model.
+
+    Methods:
+        __init__(wavevector, mixture, contrast):
+            Initializes a `SimpleSphere` instance with given wavevector, mixture, and contrast.
+
+    Usage:
+        The typical usage involves creating an instance of `SimpleSphere` with specific wavevector,
+        mixture, and contrast parameters, then using its inherited methods to compute scattering properties.
+
+    Example:
+        Initialize a `SimpleSphere` instance with wavevector, mixture, and contrast parameters:
+
+            >>> import numpy as np
+            >>> from mixscatter import Mixture, SimpleSphere
+            >>> wavevector = np.linspace(0.01, 1.0, 100)
+            >>> mixture = Mixture(number_fraction=[0.5, 0.5], radius=[1.0, 2.0])
+            >>> model = SimpleSphere(wavevector, mixture, contrast=1.0)
+            >>> form_factor = model.average_form_factor
+
+    Notes:
+        - The particle radii are inferred from the provided `Mixture` instance.
+    """
 
     def __init__(self, wavevector: ArrayLike, mixture: MixtureLike, contrast: float) -> None:
+        """
+        Initializes a `SimpleSphere` instance.
+
+        Args:
+            wavevector: Array of wavevector values at which scattering properties are computed.
+            mixture: `Mixture` object containing number fractions and radii of particle components.
+            contrast: Scattering contrast of the spheres.
+        """
         particles = []
         particle_builder = ParticleBuilder()
         for radius in mixture.radius:
@@ -422,7 +834,42 @@ class SimpleSphere(ScatteringModel):
 
 
 class SimpleCoreShell(ScatteringModel):
-    """A convenience class for creating a scattering model of core-shell particles."""
+    # noinspection PyShadowingNames
+    """
+    A convenience class for creating a scattering model of core-shell particles with a constant core-to-shell ratio.
+
+    This class simplifies the creation of a scattering model where particles are represented
+    by core-shell structures with varying contrasts for the core and shell layers.
+
+    Attributes:
+        wavevector (NDArray[np.float64]): Array of wavevector values at which scattering properties are computed.
+        mixture (MixtureLike): `Mixture` object containing number fractions and radii of particle components.
+        particles (list): List of `Particle` instances representing the particles in the scattering model.
+
+    Methods:
+        __init__(wavevector, mixture, core_to_total_ratio, core_contrast, shell_contrast):
+            Initializes a `SimpleCoreShell` instance with given wavevector, mixture, and contrast parameters.
+
+    Usage:
+        The typical usage involves creating an instance of `SimpleCoreShell` with specific wavevector, mixture,
+        core-shell ratio, and contrast parameters, then using its inherited methods to compute scattering
+        properties.
+
+    Example:
+        Initialize a `SimpleCoreShell` instance with wavevector, mixture, and contrast parameters
+
+            >>> import numpy as np
+            >>> from mixscatter import Mixture, SimpleCoreShell
+            >>> wavevector = np.linspace(0.01, 1.0, 100)
+            >>> mixture = Mixture(number_fraction=[0.5, 0.5], radius=[1.0, 2.0])
+            >>> model = SimpleCoreShell(
+            ...     wavevector, mixture, core_to_total_ratio=0.5, core_contrast=1.0, shell_contrast=0.5
+            ... )
+            >>> form_factor = model.average_form_factor
+
+    Notes:
+        - The particle radii are inferred from the provided `Mixture` instance.
+    """
 
     def __init__(
         self,
@@ -432,6 +879,16 @@ class SimpleCoreShell(ScatteringModel):
         core_contrast: float,
         shell_contrast: float,
     ) -> None:
+        """
+        Initializes a `SimpleCoreShell` instance.
+
+        Args:
+            wavevector: Array of wavevector values at which scattering properties are computed.
+            mixture: `Mixture` object containing number fractions and radii of particle components.
+            core_to_total_ratio: Ratio of core radius to total particle radius.
+            core_contrast: Scattering contrast of the core.
+            shell_contrast: Scattering contrast of the shell.
+        """
         particles = []
         particle_builder = ParticleBuilder()
         for total_radius in mixture.radius:
@@ -446,7 +903,35 @@ class SimpleCoreShell(ScatteringModel):
 
 
 class SimpleGradient(ScatteringModel):
-    """A convenience class for creating a scattering model with gradient profiles."""
+    # noinspection PyShadowingNames
+    """
+    A convenience class for creating a scattering model of particles with a linear contrast gradient.
+
+    This class simplifies the creation of a scattering model representing particles with a scattering contrast
+    varying linearly from the contrast at the particle center to the contrast at the boundary.
+
+    Methods:
+        __init__(wavevector, mixture, center_contrast, boundary_contrast):
+            Initializes a `SimpleGradient` instance with given wavevector, mixture, and center and boundary
+            contrast.
+
+    Usage:
+        The typical usage involves creating an instance of `SimpleGradient` with specific wavevector, mixture,
+        and contrast profile, then using its inherited methods to compute scattering properties.
+
+    Example:
+        Initialize a `SimpleGradient` instance with wavevector, mixture, and contrast parameters:
+
+            >>> import numpy as np
+            >>> from mixscatter import Mixture
+            >>> wavevector = np.linspace(0.01, 1.0, 100)
+            >>> mixture = Mixture(number_fraction=[0.5, 0.5], radius=[1.0, 2.0])
+            >>> model = SimpleGradient(wavevector, mixture, center_contrast=1.0, boundary_contrast=0.5)
+            >>> form_factor = model.average_form_factor
+
+    Notes:
+        - The particle radii are inferred from the provided `Mixture` instance.
+    """
 
     def __init__(
         self,
