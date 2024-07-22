@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "mixscatter"
-version = "0.2.2"
+version = "0.2.3"
 description = """\
 A versatile tool for calculating scattering functions of particle mixtures, \
 particularly for small-angle scattering (SAS) or static and dynamic light scattering (SLS & DLS) \
