@@ -16,9 +16,6 @@ Classes:
     SimpleCoreShell: A convenience class for creating a scattering model of core-shell particles.
     SimpleGradient: A convenience class for creating a scattering model with gradient profiles.
 
-Functions:
-    _two_point_to_slope_intercept: Utility function for calculating slope and intercept between two points.
-
 Examples:
     Create a simple scattering model for spheres:
 
@@ -619,31 +616,6 @@ class ScatteringModel:
     Methods:
         __init__(wavevector, mixture, particles):
             Initializes a `ScatteringModel` instance with given wavevector, mixture, and particles.
-
-        amplitude():
-            Calculates the scattering amplitude for each particle in the model.
-
-        forward_amplitude():
-            Calculates the forward scattering amplitude for each particle in the model.
-
-        single_form_factor():
-            Computes the normalized form factors of the single species particles.
-
-        average_square_amplitude():
-            Computes the sum of squared scattering amplitudes weighted by number fractions.
-
-        average_square_forward_amplitude():
-            Computes the sum of squared forward scattering amplitudes weighted by number fractions.
-
-        average_form_factor():
-            Computes the average form factor normalized by the average forward scattering amplitude.
-
-        square_radius_of_gyration():
-            Calculates the radius of gyration for each particle in the model.
-
-        average_square_radius_of_gyration():
-            Computes the average, apparent radius of gyration of the system. The apparent radius of gyration
-            determines the inital slope of the average form factor.
 
     Usage:
         The typical usage involves creating an instance of `ScatteringModel` with wavevector, mixture,
