@@ -20,6 +20,7 @@ References:
 from abc import ABC, abstractmethod
 from functools import cached_property
 from typing import Protocol, runtime_checkable
+from copy import deepcopy
 
 import numpy as np
 from numpy.typing import ArrayLike, NDArray
@@ -276,7 +277,7 @@ class PercusYevick(LiquidStructure):
 
 class VerletWeis(PercusYevick):
     """
-    Hard-sphere potential in the Percus-Yevick approximation employing the Verlet-Weiss correction.
+    Hard-sphere potential in the Percus-Yevick approximation employing the Verlet-Weis correction.
 
     Uses the PercusYevick class with an effective volume fraction and an effective radius.
 
@@ -296,13 +297,16 @@ class VerletWeis(PercusYevick):
         """
         effective_volume_fraction = volume_fraction_total * (1.0 - volume_fraction_total / 16.0)
         effective_radius = mixture.radius * (effective_volume_fraction / volume_fraction_total) ** (1.0 / 3.0)
-
+        effective_mixture = deepcopy(mixture)
         # Some static type checkers at the moment cannot handle protocols implementing property setters
         # and since a mutable radius property is only needed here, a manual isinstance assertion is performed
-        if isinstance(mixture, HasMutableRadius) and getattr(type(mixture), "radius").fset is not None:
-            mixture.radius = effective_radius
-            assert isinstance(mixture, MixtureLike)
+        if (
+            isinstance(effective_mixture, HasMutableRadius)
+            and getattr(type(effective_mixture), "radius").fset is not None
+        ):
+            effective_mixture.radius = effective_radius
+            assert isinstance(effective_mixture, MixtureLike)
         else:
             raise AttributeError("`radius` property of `mixture` must be mutable.")
 
-        super().__init__(wavevector, mixture, volume_fraction_total=effective_volume_fraction)
+        super().__init__(wavevector, effective_mixture, volume_fraction_total=effective_volume_fraction)
