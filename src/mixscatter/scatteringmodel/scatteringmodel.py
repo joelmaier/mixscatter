@@ -694,8 +694,8 @@ class ScatteringModel:
         Returns:
             The average squared scattering amplitude.
         """
-        average_square_amplitude: NDArray[np.float64] = np.sum(
-            self.mixture.number_fraction[:, np.newaxis] * self.amplitude**2, axis=0, dtype=np.float64
+        average_square_amplitude: NDArray[np.float64] = np.asanyarray(
+            np.sum(self.mixture.number_fraction[:, np.newaxis] * self.amplitude**2, axis=0), dtype=np.float64
         )
         return average_square_amplitude
 
@@ -706,8 +706,8 @@ class ScatteringModel:
         Returns:
             The average squared forward scattering amplitude.
         """
-        average_square_forward_amplitude: float = np.sum(
-            self.mixture.number_fraction * self.forward_amplitude**2, axis=0, dtype=np.float64
+        average_square_forward_amplitude = float(
+            np.sum(self.mixture.number_fraction * self.forward_amplitude**2, axis=0)
         )
         return average_square_forward_amplitude
 
@@ -718,7 +718,8 @@ class ScatteringModel:
         Returns:
             The average form factor.
         """
-        return self.average_square_amplitude / self.average_square_forward_amplitude
+
+        return np.asanyarray(self.average_square_amplitude / self.average_square_forward_amplitude, dtype=np.float64)
 
     @cached_property
     def square_radius_of_gyration(self) -> NDArray[np.float64]:
@@ -736,18 +737,14 @@ class ScatteringModel:
     @cached_property
     def average_square_radius_of_gyration(self) -> float:
         """
-        Computes the average, apparent radius of gyration of the system. The apparent radius of gyration
-        determines the initial slope of the average form factor.
+        Computes the average, apparent radius of gyration of the system. The apparent radius of
+        gyration determines the initial slope of the average form factor.
 
         Returns:
              The average radius of gyration of the system.
         """
-        average_square_radius_of_gyration: float = (
-            np.sum(
-                self.mixture.number_fraction * self.forward_amplitude**2 * self.square_radius_of_gyration,
-                axis=0,
-                dtype=np.float64,
-            )
+        average_square_radius_of_gyration: float = float(
+            np.sum(self.mixture.number_fraction * self.forward_amplitude**2 * self.square_radius_of_gyration, axis=0)
             / self.average_square_forward_amplitude
         )
         return average_square_radius_of_gyration

@@ -191,13 +191,14 @@ class FlorySchulzMixture(Mixture):
         cls, number_of_components: int, mean_radius: float, shape_parameter: float
     ) -> tuple[NDArray[np.float64], NDArray[np.float64]]:
         roots, weights = cls._generalized_laguerre_weights(number_of_components, shape_parameter)
-        scaled_roots = roots * mean_radius / (shape_parameter + 1.0)
+        scaled_roots = np.asanyarray(roots * mean_radius / (shape_parameter + 1.0), dtype=np.float64)
         weights /= np.sum(weights)
         return scaled_roots, weights
 
     @staticmethod
     def _generalized_laguerre_weights(order: int, exponent: float) -> tuple[NDArray[np.float64], NDArray[np.float64]]:
         roots, *_ = roots_genlaguerre(order, exponent)
+        roots = np.asanyarray(roots, dtype=np.float64)
         values_at_roots = eval_genlaguerre(order + 1, exponent, roots)
         abs_values_at_roots = np.abs(values_at_roots)
         log_weights = np.log(roots) - 2.0 * np.log(abs_values_at_roots)

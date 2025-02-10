@@ -133,7 +133,7 @@ class LiquidStructure(ABC):
         unity_tensor_qij = np.eye(self.mixture.number_of_components)[np.newaxis, :, :]
         S_inv_qij = unity_tensor_qij - c_weighted_qij
         S_qij = np.linalg.solve(S_inv_qij, unity_tensor_qij)
-        S_ijq = np.moveaxis(S_qij, 0, -1)
+        S_ijq = np.asanyarray(np.moveaxis(S_qij, 0, -1), dtype=np.float64)
         return S_ijq
 
     @cached_property
