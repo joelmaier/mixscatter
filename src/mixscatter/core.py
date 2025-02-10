@@ -200,11 +200,13 @@ def measurable_diffusion_coefficient(
         ...     scattering_model, thermal_energy=1.0, viscosity=1.0
         ... )
     """
-    weighted_inverse_radius: NDArray[np.float64] = np.sum(
-        scattering_model.mixture.number_fraction[:, np.newaxis]
-        * scattering_model.amplitude**2
-        / scattering_model.mixture.radius[:, np.newaxis],
-        axis=0,
+    weighted_inverse_radius: NDArray[np.float64] = np.asanyarray(
+        np.sum(
+            scattering_model.mixture.number_fraction[:, np.newaxis]
+            * scattering_model.amplitude**2
+            / scattering_model.mixture.radius[:, np.newaxis],
+            axis=0,
+        ),
         dtype=np.float64,
     )
     weighted_inverse_radius /= scattering_model.average_square_amplitude
